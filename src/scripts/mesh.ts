@@ -493,9 +493,13 @@ export function mountMesh(host: HTMLElement, opts: MeshOptions = {}): () => void
     // raises devicePixelRatio) and trackpad pinch-zoom (visualViewport.scale,
     // which doesn't), so the equations and their links stay sharp when
     // zoomed in. Quarter steps avoid re-rendering on every tiny change; 3x
-    // keeps the canvas affordable.
+    // keeps the canvas affordable. A phone's full-screen layer is redrawn
+    // every frame, so unzoomed it renders at 2x: at the mesh's faint ink a
+    // 3x screen shows no difference, and each frame fills 2.25x fewer pixels
+    // (the cost WebKit feels most). Pinch-zoomed, it goes up to 3x again.
     const pinch = Math.max(1, window.visualViewport?.scale ?? 1);
-    const ndpr = Math.min(Math.ceil((window.devicePixelRatio || 1) * pinch * 4) / 4, 3);
+    const cap = coarse && pinch <= 1 ? 2 : 3;
+    const ndpr = Math.min(Math.ceil((window.devicePixelRatio || 1) * pinch * 4) / 4, cap);
     if (nw === W && nh === H && ndpr === dpr) return;
     // Keep nodes where they are, relative to the new size (no re-seed flash
     // when a mobile URL bar shows or hides).

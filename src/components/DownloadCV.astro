@@ -95,6 +95,27 @@ const { label = 'Download CV', class: className } = Astro.props;
     transform: rotateX(-180deg);
   }
 
+  /* backface-visibility alone is not enough: while an ancestor fades (the
+     page's entrance, a page transition) Safari flattens the 3D, and the back
+     face would show through upside down. So the face turned away is also
+     hidden outright, switching at the edge-on moment of the turn (the spring
+     gets there at about a quarter of its duration). */
+  .dl-cv__face {
+    transition:
+      background-color 200ms var(--ease-out),
+      box-shadow 200ms var(--ease-out),
+      visibility 0s linear calc(var(--flip-dur) * 0.22);
+  }
+
+  .dl-cv__back,
+  .dl-cv.is-flipped .dl-cv__front {
+    visibility: hidden;
+  }
+
+  .dl-cv.is-flipped .dl-cv__back {
+    visibility: visible;
+  }
+
   .dl-cv__icon {
     flex: none;
     fill: none;

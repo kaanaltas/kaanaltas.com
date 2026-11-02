@@ -121,6 +121,14 @@ import MicroIcon from './MicroIcon.astro';
     left: var(--s-4);
   }
 
+  /* Placed drawings off screen are not rendered at all (a page holds a
+     dozen detailed SVGs, and WebKit repaints SVG on the main thread). The
+     size is remembered once seen, so the page never jumps. */
+  .fig-frame--bleed {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 420px;
+  }
+
   /* A placed drawing keeps the page's vertical scroll and pinch zoom, and
      gives a sideways finger to its live layer (scrubbing a horizon, a sweep,
      a slider) instead of losing it to the browser. */

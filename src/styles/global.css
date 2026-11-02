@@ -399,6 +399,22 @@ button:active .icon {
   display: none;
 }
 
+/* The header is named only while a transition runs (a named element is a
+   Backdrop Root). CSS names it as soon as one starts, so it is never late;
+   Base.astro's script stays as the fallback for browsers without
+   :active-view-transition. */
+html:active-view-transition .site-header {
+  view-transition-name: site-header;
+}
+
+/* If only one side got its header named (a slow page whose script ran
+   late), there is nothing to hand over to: keep that one header on screen
+   for the whole transition instead of dropping it. */
+::view-transition-old(site-header):only-child {
+  display: block;
+  animation: none;
+}
+
 ::view-transition-old(root) {
   animation: 400ms cubic-bezier(0.6, 0, 0.8, 1) both vt-hide;
 }
