@@ -1,0 +1,868 @@
+---
+// Every figure on the site, packed into justified rows across the whole
+// window (docs/design-system.md §5e). Layout: src/scripts/gallery-core.js,
+// inlined after the grid so the first paint is already laid out; without
+// JavaScript the CSS below packs the same tiles with flex-grow by aspect
+// ratio. Interaction (zoom, selection, reorder, Quick Look): gallery.ts.
+import Base from '../layouts/Base.astro';
+import Figure from '../components/Figure.astro';
+import MicroIcon from '../components/MicroIcon.astro';
+import { person } from '../data/cv';
+import { gallery, galleryIntro } from '../data/gallery';
+import core from '../scripts/gallery-core.js?raw';
+
+const svgs = import.meta.glob<string>('../figures/*.svg', { query: '?raw', import: 'default', eager: true });
+const slugOf = (p: string) => p.split('/').pop()!.replace(/\.svg$/, '');
+const missing = Object.keys(svgs)
+  .map(slugOf)
+  .filter((s) => !gallery.some((f) => f.slug === s));
+if (missing.length) throw new Error(`gallery: figures not in data/gallery.ts: ${missing.join(', ')}`);
+
+/** viewBox width and height: the art's exact aspect ratio. */
+const box = (slug: string) => {
+  const m = svgs[`../figures/${slug}.svg`].match(/viewBox="\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)/);
+  if (!m) throw new Error(`gallery: no viewBox in ${slug}.svg`);
+  return { w: Number(m[1]), h: Number(m[2]) };
+};
+const tiles = gallery.map((f, i) => {
+  const { w, h } = box(f.slug);
+  return { ...f, n: i + 1, r: +(w / h).toFixed(6), size: w <= 480 ? ('compact' as const) : ('wide' as const) };
+});
+---
+
+<Base title={galleryIntro.title} description={`${person.name}: every technical drawing on the site, in one place.`}>
+  <div class="g-page">
+    <header class="g-head enter">
+      <h1>{galleryIntro.title}</h1>
+      <p class="g-lede">{galleryIntro.lede}</p>
+      <p class="g-hint label" data-g-hint hidden>
+        <span class="g-hint-fine">Pinch or <span data-mod-key data-mod-space>⌘</span>± to zoom · Double-click or Space to open · Drag to move</span>
+        <span class="g-hint-touch">Pinch to zoom · Tap to open · Hold to move</span>
+      </p>
+    </header>
+
+    <p id="g-help" class="sr-only">
+      Arrow keys move between figures, Space or Enter opens one large, <span data-alt-key>Option</span> with Left or Right Arrow moves it, plus and
+      minus zoom. A double-click opens a figure like Space.
+    </p>
+
+    <div class="g-grid" data-gallery data-order={tiles.map((t) => t.slug).join(' ')} role="list" aria-label="Figures">
+      {
+        tiles.map((t) => (
+          <div class="g-tile" id={t.slug} role="listitem" data-tile data-live="hover" data-live-auto data-r={t.r} data-title={t.title} style={`--r: ${t.r}`}>
+            <Figure slug={t.slug} n={t.n} caption={t.caption} size={t.size} />
+          </div>
+        ))
+      }
+    </div>
+    <script is:inline set:html={core} />
+
+    <div class="g-dock" data-g-dock hidden>
+      <button class="g-dock-btn" type="button" data-zoom-out aria-label="Zoom out">
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3.75 8h8.5"></path></svg>
+      </button>
+      <input class="g-zoom" type="range" min="0" max="1000" step="1" value="500" aria-label="Zoom" data-zoom />
+      <button class="g-dock-btn" type="button" data-zoom-in aria-label="Zoom in">
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3.75 8h8.5M8 3.75v8.5"></path></svg>
+      </button>
+      <button class="g-dock-text" type="button" data-reset hidden>Reset order</button>
+    </div>
+
+    <dialog class="ql" data-ql aria-labelledby="ql-title" tabindex="-1">
+      <div class="ql-scrim" data-ql-scrim></div>
+      <div class="ql-bar" data-ql-chrome>
+        <h2 class="ql-title" id="ql-title" data-ql-title></h2>
+        <span class="label num ql-count" data-ql-count></span>
+        <button class="ql-close" type="button" data-ql-close>
+          Done<kbd class="ql-key">esc</kbd>
+        </button>
+      </div>
+      <div class="ql-stage" data-ql-stage data-live="pointer"></div>
+      <button class="ql-nav ql-prev" type="button" data-ql-prev data-ql-chrome aria-label="Previous figure">
+        <MicroIcon name="arrow-right" size={20} />
+      </button>
+      <button class="ql-nav ql-next" type="button" data-ql-next data-ql-chrome aria-label="Next figure">
+        <MicroIcon name="arrow-right" size={20} />
+      </button>
+    </dialog>
+
+    <p class="sr-only" aria-live="polite" data-g-live></p>
+  </div>
+</Base>
+
+<script>
+  import { initGallery } from '../scripts/gallery';
+
+  initGallery();
+</script>
+
+<style is:global>
+  /* The tile spacing is registered so Quick Look's close can animate it (the
+     figure lands on its tile's exact padding and radius, gallery.ts). */
+  @property --g-px {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 12px;
+  }
+  @property --g-pt {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 34px;
+  }
+  @property --g-pb {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 12px;
+  }
+  @property --g-radius {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 14px;
+  }
+
+  /* ---------------------------------------------------------------- page */
+  .g-page {
+    padding-block: var(--s-7) var(--s-8);
+    /* Nothing in the grid (a lifted tile, a spring overshoot) can ever add a
+       sideways scrollbar. Clip, not hidden: no scroll container, so sticky
+       and the anchored zoom keep working. */
+    overflow-x: clip;
+  }
+
+  .g-head {
+    width: 100%;
+    max-width: calc(var(--measure) + 2 * var(--gutter));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .g-head h1 {
+    font-size: var(--t-h1);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .g-lede {
+    margin-top: var(--s-2);
+    color: var(--text-2);
+  }
+
+  .g-hint {
+    text-wrap: balance;
+    margin-top: var(--s-4);
+    color: var(--text-3);
+    letter-spacing: 0.03em;
+  }
+
+  /* Revealed by gallery.ts (the gestures need it); until then it keeps its
+     line, so the grid doesn't shift down when it appears. */
+  .g-hint[hidden] {
+    display: block;
+    visibility: hidden;
+  }
+
+  .g-hint-touch {
+    display: none;
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    .g-hint-fine {
+      display: none;
+    }
+    .g-hint-touch {
+      display: inline;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .g-page {
+      padding-block: var(--s-9) var(--s-9);
+    }
+  }
+
+  /* ---------------------------------------------------------------- grid */
+  /* No-JS / pre-layout: justified rows from flex alone. Each tile's basis is
+     its width at the target row height and it grows in proportion to its
+     aspect ratio, so every drawing in a line keeps its exact proportions. */
+  .g-grid {
+    --row-h: clamp(200px, 11vw + 140px, 460px);
+    --g-gap: 12px;
+    --g-px: 12px;
+    --g-pt: 34px;
+    --g-pb: 12px;
+    --g-radius: 14px;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    column-gap: var(--g-gap);
+    margin: var(--s-7) var(--gutter) 0;
+    user-select: none;
+    -webkit-user-select: none;
+    /* Long-press lifts a tile: no iOS callout menu over it. */
+    -webkit-touch-callout: none;
+    touch-action: pan-y;
+  }
+
+  @media (max-width: 639.98px) {
+    .g-grid {
+      --row-h: 200px;
+      --g-gap: 8px;
+    }
+  }
+
+  .g-tile {
+    position: relative;
+    flex: var(--r) 1 calc(var(--r) * var(--row-h) + 2 * var(--g-px));
+    min-width: 0;
+    margin-bottom: var(--g-gap);
+    border-radius: var(--g-radius);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Laid out by gallery-core.js: absolute boxes, springs move them. */
+  .g-grid.is-laid {
+    display: block;
+  }
+
+  .g-grid.is-laid .g-tile {
+    position: absolute;
+    margin: 0;
+    transform-origin: 0 0;
+  }
+
+  /* --------------------------------------------------------------- tiles */
+  /* The site's figure frame, unframed: the art sits on its own light tile
+     (surface, cobalt dot grid, hairline), and the caption hangs under it. */
+  .g-grid .g-tile .fig-frame,
+  .ql .ql-stage .fig-frame {
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .g-grid .g-tile .fig-art,
+  .ql .ql-stage .fig-art {
+    padding: var(--g-pt) var(--g-px) var(--g-pb);
+    border-radius: var(--g-radius);
+    background-color: var(--surface);
+    background-image: radial-gradient(var(--fig-dot) 0.75px, transparent 0.8px);
+    background-size: 6px 6px;
+    box-shadow: var(--shadow-hair);
+    transition: box-shadow 180ms var(--ease-out);
+  }
+
+  .g-grid .g-tile .fig-art svg,
+  .ql .ql-stage .fig-art svg {
+    width: 100%;
+    max-width: none;
+  }
+
+  .g-grid .g-tile .fig-tag {
+    top: 11px;
+    left: calc(var(--g-px) + 1px);
+  }
+
+  .g-grid .g-tile .fig-toggle {
+    top: 5px;
+    right: 6px;
+    z-index: 2;
+  }
+
+  /* Two lines, always: every tile in a row ends on the same line, so the
+     layout can be computed without measuring text. Quick Look has the rest. */
+  .g-grid .g-tile figcaption {
+    height: 36px;
+    margin-top: 8px;
+    padding-inline: 2px;
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 18px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  /* Zoomed out: thumbnails only, Atlas-small. Captions stay for screen readers. */
+  .g-grid[data-compact] .fig-tag,
+  .g-grid[data-compact] .fig-toggle {
+    visibility: hidden;
+  }
+
+  .g-grid[data-compact] figcaption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  /* Ambient loops hold still while tiles are moving (gallery.ts adds
+     .is-moving for the length of a zoom or drag) and in the thumbnail wall,
+     where they are too small to read: a running loop inside a moving or
+     scaled layer re-renders it every frame. */
+  .g-grid.is-moving .fig-frame svg *,
+  .g-grid[data-compact] .fig-frame svg * {
+    animation-play-state: paused !important;
+  }
+
+  /* The pointer and keyboard target over the art (added by gallery.ts). */
+  .g-hit {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--art-h, 100%);
+    border-radius: var(--g-radius);
+    cursor: default;
+  }
+
+  /* With a mouse the art takes the hover itself, so a figure's live layer can
+     follow the pointer (src/scripts/figure-live.ts); presses still reach the
+     grid through the tile. Touch keeps the hit button: a tap opens. */
+  @media (hover: hover) and (pointer: fine) {
+    .g-hit {
+      pointer-events: none;
+    }
+  }
+
+  .g-hit:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+    border-radius: var(--g-radius);
+  }
+
+  /* Selection: a ring floating just outside the tile, corners concentric. */
+  .g-tile::after {
+    content: '';
+    position: absolute;
+    z-index: 3;
+    top: -5px;
+    left: -5px;
+    width: calc(100% + 10px);
+    height: calc(var(--art-h, 100%) + 10px);
+    border: 2px solid var(--accent);
+    border-radius: calc(var(--g-radius) + 5px);
+    opacity: 0;
+    scale: 0.985;
+    pointer-events: none;
+    transition:
+      opacity 120ms var(--ease-out),
+      scale 180ms var(--spring-quick);
+  }
+
+  .g-grid[data-compact] .g-tile::after {
+    top: -4px;
+    left: -4px;
+    width: calc(100% + 8px);
+    height: calc(var(--art-h, 100%) + 8px);
+    border-width: 1.5px;
+    border-radius: calc(var(--g-radius) + 4px);
+  }
+
+  .g-tile.is-selected::after {
+    opacity: 1;
+    scale: 1;
+  }
+
+  /* Lifted while dragged: it rides above the rest with a soft shadow; its
+     caption steps back so a dragged deck reads as drawings only. */
+  .g-grid .g-tile figcaption {
+    transition: opacity 150ms var(--ease-out);
+  }
+
+  .g-tile.is-lifted .fig-art {
+    box-shadow: var(--shadow-float);
+  }
+
+  /* A finger on a tile: it gives under the press at once, and keeps sinking
+     a touch over the long-press, so the lift that follows reads as the hold
+     coming due (iOS's press-and-hold). Released or lifted, it springs back. */
+  .g-grid .g-tile .fig-art {
+    transition:
+      box-shadow 180ms var(--ease-out),
+      scale 240ms var(--spring-quick);
+  }
+
+  .g-grid .g-tile.is-pressing .fig-art {
+    scale: 0.965;
+    transition:
+      box-shadow 180ms var(--ease-out),
+      scale 380ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+
+  .g-grid .g-tile.is-lifted figcaption,
+  .g-grid .g-tile.is-lifted .fig-toggle {
+    opacity: 0;
+  }
+
+  /* How many are in the dragged deck. */
+  .g-count {
+    position: absolute;
+    z-index: 4;
+    top: -9px;
+    right: -9px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 11px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 22px;
+    text-align: center;
+    color: var(--on-accent);
+    background: var(--accent);
+    box-shadow: 0 2px 6px -2px rgb(19 66 255 / 0.5);
+  }
+
+  .g-grid.is-dragging,
+  .g-grid.is-dragging .g-hit,
+  .g-grid.is-dragging .fig-art {
+    cursor: grabbing;
+  }
+
+  /* While in Quick Look, its tile is an empty slot under the scrim. */
+  .g-tile.is-out::after {
+    opacity: 0;
+  }
+
+  .g-marquee {
+    position: absolute;
+    z-index: 60;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--accent) 13%, transparent);
+    pointer-events: none;
+  }
+
+  /* ---------------------------------------------------------------- dock */
+  /* Zoom: a small piece of the site's clear glass (global.css), bottom
+     centre. Icons and a track, no text, so it takes the pill's alpha. One 1px
+     edge, a soft shadow; the tokens turn opaque without backdrop-filter or
+     under reduced transparency or more contrast. */
+  .g-dock {
+    --g-icon: #6e6e73;
+    --g-text-2: #56565b;
+    --g-track: rgb(20 20 40 / 0.14);
+    position: fixed;
+    z-index: 30;
+    bottom: max(var(--gutter), env(safe-area-inset-bottom));
+    left: 50%;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 34px;
+    padding: 0 3px;
+    border-radius: 12px;
+    color: var(--g-icon);
+    background: rgb(var(--glass-tint) / var(--glass-alpha));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    box-shadow:
+      inset 0 0 0 1px var(--glass-edge),
+      var(--glass-shadow);
+    translate: -50% 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity 240ms var(--ease-out),
+      translate 320ms var(--spring-quick);
+  }
+
+  html[data-theme='dark'] .g-dock {
+    --g-icon: #98989d;
+    --g-text-2: #b1b1b6;
+    --g-track: rgb(255 255 255 / 0.16);
+  }
+
+  /* Touch: pinch is the zoom, so the dock only appears to offer "Reset
+     order", and then holds only that. */
+  @media (pointer: coarse) {
+    .g-dock:not(.has-reset) {
+      display: none;
+    }
+    .g-dock .g-dock-btn,
+    .g-dock .g-zoom,
+    .g-dock .g-dock-text::before {
+      display: none;
+    }
+    .g-dock .g-dock-text {
+      margin-left: 0;
+    }
+  }
+
+  .g-dock.is-shown {
+    opacity: 1;
+    translate: -50% 0;
+    pointer-events: auto;
+  }
+
+  .g-dock-btn {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    transition:
+      color 200ms var(--ease-out),
+      background-color 200ms var(--ease-out),
+      scale var(--dur-quick) var(--spring-quick);
+  }
+
+  .g-dock-btn svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+
+  .g-dock-btn:active,
+  .g-dock-text:active {
+    scale: 0.92;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .g-dock-btn:hover,
+    .g-dock-text:hover {
+      color: var(--text);
+    }
+  }
+
+  .g-zoom {
+    width: 112px;
+    height: 28px;
+    margin: 0 4px;
+    background: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  .g-zoom::-webkit-slider-runnable-track {
+    height: 2px;
+    border-radius: 1px;
+    background: var(--g-track);
+  }
+
+  .g-zoom::-moz-range-track {
+    height: 2px;
+    border-radius: 1px;
+    background: var(--g-track);
+  }
+
+  .g-zoom::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    margin-top: -6px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow:
+      0 0 0 0.5px rgb(20 20 40 / 0.22),
+      0 1px 3px rgb(20 20 40 / 0.2);
+  }
+
+  .g-zoom::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow:
+      0 0 0 0.5px rgb(20 20 40 / 0.22),
+      0 1px 3px rgb(20 20 40 / 0.2);
+  }
+
+  .g-zoom:focus-visible {
+    outline-offset: 0;
+    border-radius: 8px;
+  }
+
+  .g-dock-text {
+    position: relative;
+    height: 28px;
+    margin-left: 7px;
+    padding: 0 9px;
+    border-radius: 9px;
+    font-size: 13px;
+    color: var(--g-text-2);
+    white-space: nowrap;
+    transition:
+      color 200ms var(--ease-out),
+      scale var(--dur-quick) var(--spring-quick);
+  }
+
+  /* Hairline between the zoom and Reset order. */
+  .g-dock-text::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 7px;
+    bottom: 7px;
+    width: 1px;
+    background: var(--g-track);
+  }
+
+  .g-dock-text[hidden] {
+    display: none;
+  }
+
+  /* ---------------------------------------------------------- Quick Look */
+  html.ql-open {
+    overflow: hidden;
+  }
+
+  .ql {
+    --g-px: 20px;
+    --g-pt: 40px;
+    --g-pb: 20px;
+    --g-radius: 18px;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  /* Touch: the sheet takes swipes (sideways to step, down to close). */
+  .ql {
+    touch-action: none;
+  }
+
+  .ql::backdrop {
+    background: transparent;
+  }
+
+  /* Opened by a finger, the dialog itself holds focus: no ring. */
+  .ql:focus {
+    outline: none;
+  }
+
+  .ql-scrim {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    backdrop-filter: blur(14px) saturate(1.2);
+  }
+
+  .ql-stage {
+    position: absolute;
+    inset: 0;
+  }
+
+  .ql .ql-stage .fig-frame {
+    position: absolute;
+    transform-origin: 0 0;
+  }
+
+  .ql .ql-stage .fig-tag {
+    top: 14px;
+    left: 21px;
+  }
+
+  .ql .ql-stage .fig-toggle {
+    top: 8px;
+    right: 10px;
+  }
+
+  .ql .ql-stage figcaption {
+    max-width: 80ch;
+    margin-top: var(--s-3);
+    padding-inline: 2px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  /* Flying home (closeQL): the figure wears its tile's layout, so the last
+     frame of the flight is the tile itself. Mirrors the .g-grid .g-tile rules. */
+  .ql .ql-stage .fig-frame.ql-landing .fig-tag {
+    top: 11px;
+    left: calc(var(--g-px) + 1px);
+  }
+
+  .ql .ql-stage .fig-frame.ql-landing .fig-toggle {
+    top: 5px;
+    right: 6px;
+  }
+
+  .ql .ql-stage .fig-frame.ql-landing figcaption {
+    height: 36px;
+    max-width: none;
+    margin-top: 8px;
+    padding-inline: 2px;
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 18px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .ql .ql-stage .fig-frame.ql-landing.is-compact .fig-tag,
+  .ql .ql-stage .fig-frame.ql-landing.is-compact .fig-toggle {
+    visibility: hidden;
+  }
+
+  .ql .ql-stage .fig-frame.ql-landing.is-compact figcaption {
+    display: none;
+  }
+
+  .ql-bar {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    height: 56px;
+    padding: 0 var(--gutter);
+  }
+
+  .ql-title {
+    min-width: 0;
+    overflow: hidden;
+    font-size: var(--t-sm);
+    font-weight: 500;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .ql-count {
+    flex: none;
+    color: var(--text-3);
+  }
+
+  .ql-close {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 30px;
+    margin-left: auto;
+    padding: 0 6px 0 10px;
+    border-radius: 9px;
+    font-size: 13px;
+    color: var(--text-2);
+    transition:
+      color 200ms var(--ease-out),
+      scale var(--dur-quick) var(--spring-quick);
+  }
+
+  .ql-key {
+    padding: 1px 5px;
+    border-radius: 5px;
+    font-size: 11px;
+    line-height: 16px;
+    color: var(--text-2);
+    box-shadow: 0 0 0 1px var(--line-strong);
+  }
+
+  /* Keycaps are for keyboards: none on touch screens, whatever the width,
+     unless a hardware keyboard has been used (html.kbd, platform.ts). */
+  @media (hover: none), (pointer: coarse) {
+    html:not(.kbd) .ql-key {
+      display: none;
+    }
+  }
+
+  .ql-nav {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    margin-top: -20px;
+    border-radius: 12px;
+    color: var(--text-2);
+    transition:
+      color 200ms var(--ease-out),
+      background-color 200ms var(--ease-out),
+      scale var(--dur-quick) var(--spring-quick);
+  }
+
+  .ql-prev {
+    left: var(--gutter);
+  }
+
+  .ql-prev .micro {
+    scale: -1 1;
+  }
+
+  .ql-next {
+    right: var(--gutter);
+  }
+
+  .ql-bar {
+    transition:
+      background-color 220ms var(--ease-out),
+      -webkit-backdrop-filter 220ms var(--ease-out),
+      backdrop-filter 220ms var(--ease-out);
+  }
+
+  .ql.is-zoomed .ql-bar {
+    background-color: color-mix(in srgb, var(--bg) 72%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    backdrop-filter: blur(18px) saturate(1.4);
+  }
+
+  .ql-nav {
+    transition:
+      color 200ms var(--ease-out),
+      background-color 200ms var(--ease-out),
+      opacity 200ms var(--ease-out),
+      scale var(--dur-quick) var(--spring-quick);
+  }
+
+  .ql.is-zoomed .ql-nav {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .ql-close:active,
+  .ql-nav:active {
+    scale: 0.94;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ql-close:hover,
+    .ql-nav:hover {
+      color: var(--text);
+    }
+    .ql-nav:hover {
+      background-color: color-mix(in srgb, var(--text) 5%, transparent);
+    }
+  }
+
+  @media (max-width: 639.98px) {
+    .ql {
+      --g-px: 12px;
+      --g-pt: 36px;
+      --g-pb: 12px;
+      --g-radius: 14px;
+    }
+    .ql-nav {
+      top: auto;
+      bottom: max(var(--s-4), env(safe-area-inset-bottom));
+      margin-top: 0;
+    }
+    .ql-key {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,38 @@
+# macOS
+.DS_Store
+
+# dependencies
+node_modules/
+
+# build output
+dist/
+.astro/
+.next/
+out/
+build/
+
+# env
+.env
+.env.*
+!.env.example
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# editors
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.work/
+
+# figure review renders (regenerable)
+experiments/review/
+experiments/figures-*/preview/
+
+# Lab work lives on the lab/* branches (LAB.md), never on main
+/experiments/
+/src/pages/lab/
+/src/components/lab/
+/public/lab/

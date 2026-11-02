@@ -1,0 +1,66 @@
+---
+// Hairline-separated list of CV rows. Hovering one row dims its siblings.
+// Rows are <li class="row"> from Entry / Publication / plain markup.
+interface Props {
+  /** "rail" rows have a 32px logo column; "plain" rows do not. */
+  variant?: 'rail' | 'plain';
+  class?: string;
+}
+
+const { variant = 'rail', class: className } = Astro.props;
+---
+
+<ol role="list" class:list={['timeline', `timeline--${variant}`, className]}>
+  <slot />
+</ol>
+
+<style>
+  .timeline {
+    --rail: 32px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .timeline > :global(li) {
+    display: grid;
+    column-gap: var(--s-4);
+    padding-block: 20px;
+    border-top: 1px solid var(--line);
+    transition: opacity 200ms var(--ease-out);
+    /* Rows are palette jump targets: land clear of the sticky header. */
+    scroll-margin-top: 72px;
+  }
+
+  .timeline > :global(li:first-child) {
+    border-top: 0;
+  }
+
+  .timeline--rail > :global(li) {
+    grid-template-columns: var(--rail) minmax(0, 1fr);
+  }
+
+  .timeline--plain > :global(li) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .timeline:has(> :global(li:hover)) > :global(li:not(:hover)) {
+      opacity: 0.6;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .timeline--rail > :global(li) {
+      column-gap: var(--s-3);
+    }
+  }
+
+  @media print {
+    .timeline > :global(li) {
+      padding-block: 8pt;
+      break-inside: avoid;
+      opacity: 1 !important;
+    }
+  }
+</style>

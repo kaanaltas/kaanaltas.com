@@ -1,0 +1,314 @@
+---
+// One hairline row in the /work research list (leerob-style): title and
+// status on top, a short blurb, then mono tags and the year. The whole row
+// is a link when the project has one; hovering a row dims its siblings
+// (styled by the parent list in work.astro). Micro-icons (§8): ↗ or → after
+// the title of linked rows, a book on a paper's venue line, and the CV's
+// pixel-trophy prize badge on a win; they play when the row is hovered or focused (micro.css).
+import { statusLabel, type Project } from '../data/projects';
+import MicroIcon from './MicroIcon.astro';
+import PrizeBadge from './cv/PrizeBadge.astro';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const { title, blurb, tags, status, when, href, meta, metaLinks, highlight } = project;
+const external = href ? /^https?:/.test(href) : false;
+// A row with links of its own on the meta line can't be one big <a> (links
+// don't nest): the row link moves onto the title and is stretched over the
+// whole row, and the meta links sit above it.
+const stretch = !!href && !!metaLinks?.length;
+const Tag = href && !stretch ? 'a' : 'div';
+const TitleTag = stretch ? 'a' : 'span';
+const star = status === 'won' || status === 'awarded';
+// A published paper: its venue line leads with a book whose page turns.
+const paper = status === 'published' && !!href;
+// Keep the last word and the arrow together so the arrow never wraps alone.
+const cut = title.lastIndexOf(' ');
+const lead = cut > 0 ? title.slice(0, cut + 1) : '';
+const last = cut > 0 ? title.slice(cut + 1) : title;
+---
+
+<li class="row" data-logo-hover={highlight ? '' : undefined}>
+  <Tag
+    class:list={['row-inner', { 'is-link': !!href, 'is-stretched': stretch }]}
+    href={stretch ? undefined : href}
+    rel={external && !stretch ? 'noopener' : undefined}
+    data-micro-trigger={(!href && highlight) || stretch ? '' : undefined}
+  >
+    <div class="head">
+      <h3 class="title">
+        <TitleTag
+          class:list={{ 'title-link': stretch }}
+          href={stretch ? href : undefined}
+          rel={stretch && external ? 'noopener' : undefined}
+        >
+          {lead}<span class="nowrap">{last}{
+            href && <MicroIcon name={external ? 'arrow-up-right' : 'arrow-right'} class="arrow" />
+          }</span>
+          {href && external && <span class="sr-only"> (external link)</span>}
+        </TitleTag>
+      </h3>
+      <span class="status label" data-status={status}>
+        {
+          star ? (
+            <svg class="status-star" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+              <path d="M12 3.75l2.47 5.01 5.53.8-4 3.9.94 5.5L12 16.36l-4.94 2.6.94-5.5-4-3.9 5.53-.8L12 3.75z" />
+            </svg>
+          ) : (
+            <span class="status-dot" aria-hidden="true" />
+          )
+        }
+        {statusLabel[status]}
+      </span>
+    </div>
+
+    <p class="blurb">{blurb}</p>
+    {
+      meta && (
+        <p class="meta">
+          {paper && <MicroIcon name="book" class="meta-icon" />}
+          {meta}
+          {
+            metaLinks?.map((l) =>
+              l.href ? (
+                <>
+                  {' · '}
+                  <a class="meta-link link" href={l.href} rel="noopener">
+                    {l.label}
+                    <MicroIcon name="arrow-up-right" class="meta-arrow" />
+                    <span class="sr-only"> (external link)</span>
+                  </a>
+                </>
+              ) : null,
+            )
+          }
+        </p>
+      )
+    }
+
+    {
+      highlight && (
+        <p class="highlight">
+          <PrizeBadge text={highlight} />
+        </p>
+      )
+    }
+
+    <div class="foot">
+      <ul role="list" class="tags label" aria-label="Keywords">
+        {tags.map((t) => <li>{t}</li>)}
+      </ul>
+      {when && <span class="when label num">{when}</span>}
+    </div>
+  </Tag>
+</li>
+
+<style>
+  .row {
+    border-bottom: 1px solid var(--line);
+    transition: opacity 200ms var(--ease-out);
+  }
+
+  .row-inner {
+    display: block;
+    padding-block: var(--s-5);
+    color: inherit;
+    text-decoration: none;
+    border-radius: var(--r-sm);
+  }
+
+  .row-inner:focus-visible {
+    outline-offset: 4px;
+  }
+
+  /* Stretched row: the title link covers the whole row (its ::after), the
+     meta links sit above it, and the focus ring is drawn around the row. */
+  .is-stretched {
+    position: relative;
+  }
+
+  .title-link {
+    color: inherit;
+    text-decoration: none;
+    outline: none;
+  }
+
+  .title-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--r-sm);
+  }
+
+  .title-link:focus-visible::after {
+    outline: 2px solid var(--focus);
+    outline-offset: 4px;
+  }
+
+  .meta-link {
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+  }
+
+  .meta-link :global(.meta-arrow) {
+    margin-left: 1px;
+    vertical-align: -3px;
+    color: var(--text-3);
+  }
+
+  .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-4);
+  }
+
+  .title {
+    min-width: 0;
+    font-size: var(--t-body);
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    color: var(--text);
+  }
+
+  .nowrap {
+    white-space: nowrap;
+  }
+
+  .title :global(.arrow) {
+    margin-left: 3px;
+    vertical-align: -2px;
+    color: var(--text-3);
+    transition:
+      color 200ms var(--ease-out),
+      scale var(--dur-quick) var(--spring-quick);
+  }
+
+  .is-link:focus-visible :global(.arrow) {
+    color: var(--text);
+  }
+
+  /* Status: mono word with a small mark. */
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: none;
+    white-space: nowrap;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text-2);
+  }
+
+  [data-status='active'] .status-dot {
+    background: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  [data-status='building'] .status-dot {
+    background: conic-gradient(var(--text-2) 0 50%, transparent 0);
+    box-shadow: inset 0 0 0 1.25px var(--text-2);
+  }
+
+  [data-status='planned'] .status-dot {
+    background: transparent;
+    box-shadow: inset 0 0 0 1.25px var(--text-3);
+  }
+
+  .status-star {
+    fill: var(--text-2);
+    transition:
+      scale var(--dur-bounce) var(--spring-bounce),
+      rotate var(--dur-bounce) var(--spring-bounce);
+  }
+
+  .blurb {
+    margin-top: var(--s-1);
+    color: var(--text-2);
+    max-width: 58ch;
+  }
+
+  /* A win: the CV's blue pixel-trophy badge (PrizeBadge), whose trophy
+     hops when the row is hovered ([data-logo-hover] on the row). */
+  .highlight {
+    margin-top: var(--s-3);
+    line-height: 1;
+  }
+
+  .foot {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-4);
+    margin-top: var(--s-3);
+  }
+
+  .when {
+    flex: none;
+    white-space: nowrap;
+  }
+
+  /* Venue or role: a quieter line tucked under the blurb. */
+  .meta :global(.meta-icon) {
+    margin-right: 6px;
+    vertical-align: -3px;
+    color: var(--text-2);
+  }
+
+  .meta {
+    margin-top: var(--s-2);
+    font-size: var(--t-sm);
+    line-height: 1.5;
+    font-weight: 450;
+    color: var(--text);
+  }
+
+  /* Every tag carries a leading dot; the list is shifted left by one dot
+     width and clipped, so the dot that would start any line is hidden. */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 0;
+    margin: 0 0 0 -1.2em;
+    padding: 0;
+    clip-path: inset(0 0 0 1.2em);
+  }
+
+  .tags li::before {
+    content: '·' / '';
+    display: inline-block;
+    width: 1.2em;
+    text-align: center;
+    color: var(--text-3);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .is-link:hover :global(.arrow) {
+      color: var(--text);
+    }
+    .row-inner:hover .status-star {
+      scale: 1.25;
+      rotate: -14deg;
+    }
+  }
+
+  /* Touch: the same, for a press or the row on the reading line. */
+  :global(.is-hot) > .is-link :global(.arrow),
+  .is-link:global(.is-hot) :global(.arrow) {
+    color: var(--text);
+  }
+  :global(.is-hot) > .row-inner .status-star,
+  .row-inner:global(.is-hot) .status-star {
+    scale: 1.25;
+    rotate: -14deg;
+  }
+</style>

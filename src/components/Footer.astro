@@ -1,0 +1,198 @@
+---
+import ExtLink from './ExtLink.astro';
+import MicroIcon from './MicroIcon.astro';
+import PixelKA from './PixelKA.astro';
+import FooterArt from './footer/FooterArt.astro';
+import { person, socials } from '../data/cv';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer" data-footer>
+  <!-- The hairline, edge to edge like the art under it, and its light. -->
+  <div class="rule" aria-hidden="true">
+    <div class="light">
+      <div class="beam"><i class="seg"><i class="glow"></i></i></div>
+    </div>
+  </div>
+  <FooterArt />
+  <div class="container container--wide inner">
+    <p class="label sign">
+      <a class="sign-mark" href="/" aria-label="Kaan Altaş, home" data-sign><PixelKA /></a>
+      <span>© {year} {person.name}</span>
+    </p>
+    <ul role="list" class="links">
+      {
+        socials.map((s) => (
+          <li>
+            <ExtLink class="link" href={s.href} rel="me" arrow="hover">
+              {s.label}
+            </ExtLink>
+          </li>
+        ))
+      }
+      <li>
+        <a class="link mail" href={`mailto:${person.email}`}>
+          Email<MicroIcon name="mail" class="micro--reveal mail-ico" />
+        </a>
+      </li>
+    </ul>
+  </div>
+</footer>
+
+<style>
+  /* The footer: the hairline across the whole page, the art (full bleed,
+     dissolving into the page at its top and bottom), then the sign-off row
+     at the very bottom of the page on bare ground. */
+  .site-footer {
+    padding-block: var(--s-8) var(--s-6);
+  }
+  .rule {
+    position: relative;
+    height: 1px;
+    background: var(--line);
+    margin-bottom: var(--s-5);
+  }
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3) var(--s-5);
+    padding-top: var(--s-5);
+  }
+
+  /* The light. Its box is the line's own width (the page's) and reaches 72px
+     down for the glow, which lies over the art's faded top. The beam is one
+     line-wide layer that slides from -100% (its segment, at its right end,
+     just off the left edge) to +6% (the segment past the far end). */
+  .light {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 72px;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .beam {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  .beam.is-on {
+    will-change: transform, opacity;
+  }
+  /* A comet: a long tail rising to a short bright head. */
+  .seg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 34%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--accent) 22%, transparent) 40%,
+      color-mix(in oklab, var(--accent) 70%, transparent) 78%,
+      var(--accent) 93%,
+      transparent
+    );
+  }
+  /* Light spilling below the line, centred on the head (the 93% stop), so
+     one transform and one curve move both. */
+  .glow {
+    position: absolute;
+    top: 0;
+    left: calc(93% - 64.7%);
+    width: 129.4%;
+    height: 72px;
+    background: radial-gradient(
+      40% 100% at 50% 0%,
+      color-mix(in oklab, var(--accent) 9%, transparent),
+      color-mix(in oklab, var(--accent) 3%, transparent) 55%,
+      transparent
+    );
+  }
+  :global([data-theme='dark']) .glow {
+    background: radial-gradient(
+      40% 100% at 50% 0%,
+      color-mix(in oklab, var(--accent) 16%, transparent),
+      color-mix(in oklab, var(--accent) 5%, transparent) 55%,
+      transparent
+    );
+  }
+  /* The sign-off: the pixel KA, the site's maker's mark, beside the
+     copyright. It links home and waves on hover, keyboard focus and touch
+     press (brand.ts). It sits on the label's baseline; set in the text
+     colour, a step darker than the label, its 1px pixel strokes weigh the
+     same as the capitals beside it. The padding is its hit area. */
+  .sign {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .sign-mark {
+    display: inline-block;
+    padding: 6px 4px;
+    margin: -6px -4px;
+    border-radius: 6px;
+    color: var(--text);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: scale var(--dur-quick) var(--spring-quick);
+  }
+  .sign-mark:active {
+    scale: 0.94;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    /* 24px, not 16: room for the hover-only glyph after each link. */
+    gap: var(--s-2) var(--s-5);
+    font-size: var(--t-sm);
+  }
+  .links :global(.link) {
+    color: var(--text-2);
+    font-weight: 400;
+  }
+
+  /* A finger needs more than the text: the links' hit areas grow to about
+     40px tall into the row's gaps, without moving anything. */
+  @media (pointer: coarse) {
+    .links :global(.link) {
+      display: inline-block;
+      padding: 10px 8px;
+      margin: -10px -8px;
+    }
+  }
+
+  /* Each link shows its glyph only on hover or focus, in the gap after it,
+     so the quiet text row stays quiet: ↗ for profiles, an envelope whose
+     flap opens for Email. */
+  .mail {
+    position: relative;
+    display: inline-block;
+  }
+
+  .mail :global(.mail-ico) {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    margin-left: 2px;
+    transform: translateY(-50%);
+    color: var(--text-3);
+  }
+</style>
+
+<script>
+  import { initWave } from '../scripts/brand';
+  import { mountFooterLight } from './footer/footer-light';
+
+  const footer = document.querySelector<HTMLElement>('[data-footer]');
+  if (footer) mountFooterLight(footer);
+
+  const sign = document.querySelector<HTMLElement>('[data-sign]');
+  const mark = sign?.querySelector<HTMLElement>('[data-pka]');
+  if (sign && mark) initWave(mark, sign);
+</script>

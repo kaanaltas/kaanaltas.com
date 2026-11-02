@@ -1,0 +1,66 @@
+---
+// Date range in mono tabular figures: "Feb 2026 – Present", "2024 – 2025",
+// or a single date when start and end match.
+interface Props {
+  start: string;
+  end?: string;
+  /** "expected" marks an anticipated end date. */
+  note?: string;
+  class?: string;
+}
+
+const { start, end, note, class: className } = Astro.props;
+
+const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+
+/** "Feb 2026" -> "2026-02", "2026" -> "2026", anything else -> undefined. */
+function iso(s: string): string | undefined {
+  const m = s.trim().match(/^(?:([A-Za-z]{3})[a-z]*\s+)?(\d{4})$/);
+  if (!m) return undefined;
+  if (!m[1]) return m[2];
+  const i = MONTHS.indexOf(m[1].toLowerCase());
+  return i < 0 ? m[2] : `${m[2]}-${String(i + 1).padStart(2, '0')}`;
+}
+
+const single = !end || end === start;
+const expected = note === 'expected';
+---
+
+<span class:list={['dates', className]}>
+  {iso(start) ? <time datetime={iso(start)}>{start}</time> : <span>{start}</span>}
+  {
+    !single && end && (
+      <>
+        <span class="sep" aria-hidden="true">–</span>
+        <span class="sr-only">to</span>
+        {expected && (
+          <>
+            <span class="exp" aria-hidden="true">exp.</span>
+            <span class="sr-only">expected</span>
+          </>
+        )}
+        {iso(end) ? <time datetime={iso(end)}>{end}</time> : <span>{end}</span>}
+      </>
+    )
+  }
+</span>
+
+<style>
+  .dates {
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: 1.4;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+    color: var(--text-2);
+    white-space: nowrap;
+  }
+  .sep {
+    margin-inline: 0.4em;
+    color: var(--text-3);
+  }
+  .exp {
+    margin-right: 0.35em;
+    color: var(--text-2);
+  }
+</style>

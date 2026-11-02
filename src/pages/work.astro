@@ -1,0 +1,157 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectRow from '../components/ProjectRow.astro';
+import AppRow from '../components/AppRow.astro';
+import Figure from '../components/Figure.astro';
+import { person } from '../data/cv';
+import { apps, appsIntro, intro, projects, researchIntro } from '../data/projects';
+
+// Figures are numbered in page order.
+let fig = 0;
+const rows = projects.map((p) => ({ p, n: p.figure ? ++fig : undefined }));
+---
+
+<Base
+  title={intro.title}
+  description={`${person.name}: research projects in optimization and machine learning, and the tools I build for macOS and iOS.`}
+>
+  <div class="page container container--wide">
+    <header class="intro enter">
+      <h1>{intro.title}</h1>
+      <p class="lede">{intro.lede}</p>
+    </header>
+
+    <section class="block block--research" aria-labelledby="research-title">
+      <div class="block-head">
+        <h2 class="section-title" id="research-title">
+          <span class="slash" aria-hidden="true">/</span>Research &amp; projects
+        </h2>
+        <p class="block-lede">{researchIntro}</p>
+      </div>
+      <ul role="list" class="rows enter">
+        {
+          rows.map(({ p, n }) => (
+            <>
+              <ProjectRow project={p} />
+              {p.figure && (
+                <li class:list={['row-fig', `row-fig--${p.figure.size ?? 'wide'}`]}>
+                  <Figure slug={p.figure.slug} n={n} caption={p.figure.caption} size={p.figure.size} bleed />
+                </li>
+              )}
+            </>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="block" aria-labelledby="apps-title">
+      <div class="block-head">
+        <h2 class="section-title" id="apps-title">
+          <span class="slash" aria-hidden="true">/</span>Tools
+        </h2>
+        <p class="block-lede">{appsIntro}</p>
+      </div>
+      <ul role="list" class="apps">
+        {apps.map((a) => <AppRow app={a} />)}
+      </ul>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .page {
+    padding-block: var(--s-7) var(--s-8);
+  }
+
+  /* Text sits in the prose column; figures under a row break out to --wide. */
+  .page > *,
+  .block-head,
+  .rows > :global(.row),
+  .row-fig--compact {
+    max-width: var(--measure);
+    margin-inline: auto;
+  }
+
+  .page > .block--research {
+    max-width: none;
+  }
+
+  h1 {
+    font-size: var(--t-h1);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .lede {
+    margin-top: var(--s-2);
+    color: var(--text-2);
+  }
+
+  .block {
+    margin-top: var(--s-8);
+  }
+
+  .block-head .section-title {
+    margin-bottom: var(--s-1);
+    /* Search jumps here (/work#apps-title): land clear of the sticky header. */
+    scroll-margin-top: 72px;
+  }
+
+  .block-lede {
+    color: var(--text-2);
+    margin-bottom: var(--s-5);
+  }
+
+  /* Hairline rows (leerob): hovering one row dims the others. */
+  .rows {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* The hairline above the list, and above the row that follows a figure. */
+  .rows > :global(.row:first-child),
+  .row-fig + :global(.row) {
+    border-top: 1px solid var(--line);
+  }
+
+  /* A figure belongs to the row above it: no hairline between the two, and
+     the next row's hairline closes the pair. */
+  .rows > :global(.row:has(+ .row-fig)) {
+    border-bottom: 0;
+  }
+
+  .row-fig {
+    padding-block: var(--s-1) var(--s-7);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .rows:has(.row-inner:hover) > :global(.row:not(:hover)) {
+      opacity: 0.6;
+    }
+  }
+
+  /* Keyboard: the focused row stands out the same way. */
+  .rows:has(.row-inner:focus-visible, .row-inner :focus-visible) > :global(.row:not(:focus-within)) {
+    opacity: 0.6;
+  }
+
+  /* The tools are a plain hairline list, every app the same. */
+  .apps {
+    max-width: var(--measure);
+    margin: 0 auto;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (min-width: 640px) {
+    .page {
+      padding-block: var(--s-9);
+    }
+    .block {
+      margin-top: var(--s-10);
+    }
+    .row-fig {
+      padding-block: var(--s-2) var(--s-8);
+    }
+  }
+</style>

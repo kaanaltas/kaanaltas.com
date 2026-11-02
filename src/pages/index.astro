@@ -1,0 +1,286 @@
+---
+import Base from '../layouts/Base.astro';
+import EquationMesh from '../components/EquationMesh.astro';
+import SocialLinks from '../components/SocialLinks.astro';
+import MicroIcon from '../components/MicroIcon.astro';
+import { person } from '../data/cv';
+
+const pages = [
+  { href: '/interests', label: 'Interests' },
+  { href: '/work', label: 'Work' },
+  { href: '/cv', label: 'CV' },
+  { href: '/gallery', label: 'Gallery' },
+];
+
+---
+
+<Base bare>
+  <EquationMesh />
+  <section class="landing">
+    <div class="inner enter" data-mesh-mask>
+      <h1 class="name">{person.name}</h1>
+      <p class="lede">{person.intro}</p>
+      <div class="dock" data-dock>
+        <span class="dock-tab" aria-hidden="true"></span>
+        <ul role="list" class="dock-list" aria-label="Pages">
+          {
+            pages.map((p) => (
+              <li>
+                <a class="link dock-item" href={p.href}>
+                  {p.label}
+                  <MicroIcon name="arrow-right" class="dock-arrow" />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <SocialLinks class="links" />
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { initDock } from '../scripts/dock';
+
+  initDock();
+</script>
+
+<style>
+  .landing {
+    flex: 1;
+    display: grid;
+    /* Free space splits 1 : 1.7 above and below the block, so it sits a little
+       above the viewport's center (optical lift) even with the header in flow,
+       and the spacing collapses gracefully on short screens instead of
+       overflowing. */
+    grid-template-rows: 1fr auto 1.7fr;
+    padding: var(--s-6) var(--gutter);
+  }
+
+  .inner {
+    grid-row: 2;
+    width: 100%;
+    max-width: var(--landing);
+    margin-inline: auto;
+  }
+
+  .name {
+    font-size: var(--t-display);
+    line-height: 1.1;
+    font-weight: 550;
+    letter-spacing: -0.025em;
+  }
+
+  .lede {
+    margin-top: var(--s-3);
+    font-size: var(--t-lede);
+    line-height: 1.55;
+    letter-spacing: -0.005em;
+    color: var(--text-2);
+    max-width: 34em;
+  }
+
+  /* Page links (docs/design-system.md §5 b3). At rest they are the plain
+     underlined links with their arrows, which is the whole design without
+     JavaScript. With a mouse, keyboard focus or a pressing finger, the
+     item's underline rises into a small clear glass tab that slides between
+     them like the nav pill, and fades away when the pointer leaves, giving
+     the underline back. Moved by src/scripts/dock.ts. */
+  .dock {
+    /* The tab reaches this far past the text, so the first label still
+       lines up with the lede. */
+    --pad-x: 10px;
+    position: relative;
+    isolation: isolate;
+    width: fit-content;
+    max-width: calc(100% + var(--pad-x));
+    /* The row is a scrub surface for a finger (src/scripts/scrub.ts). */
+    touch-action: none;
+    /* The item is 6px taller than its line on each side; the block margins
+       take that back so the rhythm matches plain links. */
+    margin: calc(var(--s-6) - 6px) 0 -6px calc(var(--pad-x) * -1);
+  }
+
+  .dock-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .dock-item {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 36px;
+    padding-inline: var(--pad-x) calc(var(--pad-x) - 2px);
+    border-radius: 8px;
+    font-size: var(--t-body);
+    line-height: 24px;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    transition:
+      color 200ms var(--ease-out),
+      text-decoration-color 160ms var(--ease-out),
+      scale var(--dur-quick) var(--spring-quick);
+  }
+
+  /* The underline has become the tab, so the line itself goes. */
+  .dock-item.is-on {
+    text-decoration-color: transparent;
+  }
+
+  /* The arrow's story (shaft draws longer, head nudges) is in micro.css and
+     plays on hover, keyboard focus and .is-micro-on alike. Inside the tab it
+     darkens to the text colour. */
+  .dock-item :global(.dock-arrow) {
+    color: var(--text-3);
+    transition: color 200ms var(--ease-out);
+  }
+
+  .dock-item:focus-visible :global(.dock-arrow) {
+    color: var(--text-2);
+  }
+
+  .dock-item.is-on :global(.dock-arrow) {
+    color: var(--text);
+  }
+
+  .dock-item:active {
+    scale: 0.97;
+  }
+
+  .dock:has(.dock-item:active) .dock-tab {
+    scale: 0.97;
+  }
+
+  /* The tab. As .is-line it is exactly the label's underline, a 1px rule in
+     --ul-rest under the text; open, it is the whole item: a slab of clear
+     glass. Its middle adds nothing, so the page behind keeps its own colour
+     and is never whitened or greyed; the glass is all in its edges, a rim
+     caught by the light (::before: brighter at the top in dark, deeper at
+     the bottom in light), a faint glow inside the edge where a thick pane
+     bends the light, and in light a barely-there lift. 8px corners, never a
+     capsule. It rises out of the underline on the bounce spring (a small
+     overshoot), slides on the nav's spring, and on leaving fades where it
+     stands while the underline comes back. */
+  .dock-tab {
+    --rim: linear-gradient(rgb(20 20 40 / 0.05), rgb(20 20 40 / 0.11));
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    width: var(--w, 0);
+    height: var(--h, 36px);
+    translate: var(--x, 0) var(--y, 0);
+    scale: var(--s, 1);
+    border-radius: 8px;
+    pointer-events: none;
+    opacity: var(--o, 0);
+    background-color: transparent;
+    box-shadow:
+      inset 0 0 12px rgb(20 20 40 / 0.025),
+      0 1px 2px rgb(20 20 40 / 0.04),
+      0 4px 10px -6px rgb(20 20 40 / 0.1);
+    transition:
+      translate var(--dur-bounce) var(--spring-bounce),
+      width var(--dur-snappy) var(--spring-snappy),
+      height var(--dur-bounce) var(--spring-bounce),
+      border-radius 220ms var(--ease-out),
+      background-color 200ms var(--ease-out),
+      box-shadow 200ms var(--ease-out),
+      scale var(--dur-quick) var(--spring-quick),
+      opacity 120ms var(--ease-out);
+  }
+
+  /* The rim: a 1px gradient ring (the tab's box with its content box cut
+     out), so it can catch the light on one side. */
+  .dock-tab::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--rim);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    transition: opacity 160ms var(--ease-out);
+  }
+
+  .dock-tab.is-line {
+    border-radius: 1px;
+    background-color: var(--ul-rest);
+    box-shadow: none;
+  }
+
+  .dock-tab.is-line::before {
+    opacity: 0;
+  }
+
+  /* Leaving: the tab fades out where it is, settling a touch smaller, over
+     the same 180ms in which its label's underline and arrow return. */
+  .dock-tab.is-leaving {
+    transition:
+      scale 180ms var(--ease-out),
+      opacity 180ms var(--ease-out);
+  }
+
+  .dock-tab.no-anim,
+  .dock-tab.no-anim::before {
+    transition: none;
+  }
+
+  :global([data-theme='dark']) .dock-tab {
+    --rim: linear-gradient(rgb(255 255 255 / 0.15), rgb(255 255 255 / 0.035));
+    box-shadow:
+      inset 0 0 12px rgb(255 255 255 / 0.03),
+      0 4px 10px -6px rgb(0 0 0 / 0.6);
+  }
+
+  :global([data-theme='dark']) .dock-tab.is-line {
+    background-color: var(--ul-rest);
+    box-shadow: none;
+  }
+
+  .inner :global(.social) {
+    margin-top: var(--s-4);
+  }
+
+
+  @media (max-width: 639px) {
+    .dock {
+      margin-top: calc(var(--s-5) - 6px);
+    }
+  }
+
+  /* Very narrow phones (320px): tidy 2 x 2 grids instead of a lone
+     "Gallery" or "X" on its own line. */
+  @media (max-width: 359px) {
+    .dock-list {
+      display: grid;
+      grid-template-columns: repeat(2, max-content);
+    }
+    .inner :global(.social) {
+      display: grid;
+      grid-template-columns: repeat(2, max-content);
+    }
+  }
+
+  /* Phones in landscape: keep it to one screen */
+  @media (max-height: 520px) {
+    .landing {
+      padding-block: var(--s-3) var(--s-4);
+    }
+    .dock {
+      margin-top: calc(var(--s-4) - 6px);
+    }
+  }
+</style>

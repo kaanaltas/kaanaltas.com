@@ -1,0 +1,115 @@
+---
+// Brand-icon + label links to profiles elsewhere. Icons rest in gray and turn
+// to their brand color on hover; near-black brands (GitHub, X) use the text
+// color instead, so they stay visible in dark mode.
+import BrandIcon from './BrandIcon.astro';
+import { brandColors } from '../data/brands';
+import { socials, type Social } from '../data/cv';
+
+interface Props {
+  items?: readonly Social[];
+  /** Icon size in px (16, 20 or 24). */
+  size?: number;
+  /** Short labels ("Scholar" rather than "Google Scholar"). */
+  short?: boolean;
+  class?: string;
+  /** Accessible name for the list. */
+  label?: string;
+}
+
+const { items = socials, size = 16, short = true, class: className, label = 'Elsewhere' } = Astro.props;
+
+// Relative luminance below ~0.05 reads as "ink" rather than a color.
+const isInk = (hex: string | undefined) => {
+  if (!hex || !/^#[0-9a-f]{6}$/i.test(hex)) return false;
+  const [r, g, b] = [1, 3, 5].map((i) => {
+    const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b < 0.05;
+};
+---
+
+<ul role="list" class:list={['social', className]} aria-label={label}>
+  {
+    items.map((s) => (
+      <li>
+        <a class="social-link" href={s.href} rel="me noopener" target="_blank" data-ink={isInk(brandColors[s.icon]) ? '' : undefined}>
+          <BrandIcon name={s.icon} size={size} class="icon icon--pop" />
+          <span>{short ? (s.short ?? s.label) : s.label}</span>
+          <span class="sr-only">(opens in a new tab)</span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    /* A taller hit area without changing the row's rhythm */
+    padding-block: 4px;
+    margin-block: -4px;
+    font-size: var(--t-sm);
+    line-height: 20px;
+    color: var(--text-2);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      color 200ms var(--ease-out),
+      scale var(--dur-quick) var(--spring-quick);
+  }
+
+  .social-link:active {
+    scale: 0.97;
+  }
+
+  /* --lit is the "on" color: the brand color, a lighter mix of it in dark mode
+     (the brand blues sit too dark on the dark background), or the text color
+     for near-black marks (GitHub, X) so they stay visible in dark mode. */
+  .social-link :global(.brand-icon) {
+    --lit: var(--brand);
+    color: var(--text-3);
+    transition:
+      color 240ms var(--ease-out),
+      translate var(--dur-bounce) var(--spring-bounce),
+      scale var(--dur-bounce) var(--spring-bounce);
+  }
+
+  :global([data-theme='dark']) .social-link :global(.brand-icon) {
+    --lit: color-mix(in oklab, var(--brand) 78%, white);
+  }
+
+  .social-link[data-ink] :global(.brand-icon),
+  :global([data-theme='dark']) .social-link[data-ink] :global(.brand-icon) {
+    --lit: var(--text);
+  }
+
+  .social-link:focus-visible {
+    color: var(--text);
+  }
+
+  .social-link:focus-visible :global(.brand-icon) {
+    color: var(--lit);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .social-link:hover {
+      color: var(--text);
+    }
+    .social-link:hover :global(.brand-icon) {
+      color: var(--lit);
+    }
+  }
+</style>

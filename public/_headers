@@ -1,0 +1,12 @@
+# Cache rules for static hosts that read this file (Netlify, Cloudflare Pages).
+# Hashed build assets never change under the same name: cache them for a year.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fixed names that can change on a redeploy: cache a while, then revalidate.
+/fonts/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+/og/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/search-index.json
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400

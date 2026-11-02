@@ -1,0 +1,36 @@
+/* Turkish-sized Latin Extended faces (scripts/subset-fonts.py). Declared after the
+   fontsource faces they overlap: for characters in both ranges the later rule wins
+   (CSS Fonts 4, unicode-range matching), so ş, İ, ğ... come from these ~15 KB files
+   and fontsource's full latin-ext files only load for rarer letters. */
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../assets/fonts/inter-latin-ext-tr-wght.woff2') format('woff2-variations');
+  unicode-range: U+0100-017F, U+0218-021B, U+0177, U+2113, U+1D2C-1D6A;
+}
+
+@font-face {
+  font-family: 'Geist Mono Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../assets/fonts/geist-mono-latin-ext-tr-wght.woff2') format('woff2-variations');
+  /* U+1D2C-1D6A (modifier letters such as the ᵀ in cᵀx): Geist Mono has none of them,
+     so the full file would be fetched only to fall back anyway. */
+  unicode-range: U+0100-017F, U+0218-021B, U+0177, U+1D2C-1D6A;
+}
+
+/* Until Inter arrives, text is set in Arial reshaped to Inter's proportions
+   (weighted average advance and vertical metrics, computed from both font files),
+   so the swap does not rewrap lines and nothing below moves. Same technique as
+   next/font. Only ever visible for a moment on a slow first load. */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial'), local('ArialMT'), local('Arimo'), local('Liberation Sans');
+  size-adjust: 107.48%;
+  ascent-override: 90.14%;
+  descent-override: 22.44%;
+  line-gap-override: 0%;
+}

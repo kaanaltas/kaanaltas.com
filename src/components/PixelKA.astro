@@ -1,0 +1,84 @@
+---
+// The pixel "KA" (Departure Mono), the site's maker's mark in the footer
+// sign-off, with its wave (src/scripts/brand.ts, initWave). At 11px each font
+// pixel is one CSS pixel, crisp at 1x and 2x, and its eight rows stand at the
+// height of the label's capitals. The parent binds the wave to its trigger.
+---
+
+<span class="pka" aria-hidden="true" data-pka>
+  <span class="brand-text">KA</span>
+  <span class="brand-wave">
+    {
+      /* --x: the column's place on the font's pixel grid (K 0–4, A 7–11) */
+      Array.from({ length: 10 }, (_, i) => <span class="brand-col" style={`--x:${i < 5 ? i : i + 2}`}>KA</span>)
+    }
+  </span>
+</span>
+
+<style>
+  .pka {
+    position: relative;
+    display: inline-block;
+    font-family: var(--font-pixel);
+    font-size: 11px;
+    letter-spacing: 0;
+    line-height: 1;
+    text-transform: none;
+  }
+
+  /* The wave (brand.ts): ten copies of the text, each clipped to one pixel
+     column, stand in for it while it plays; every frame is the font's own
+     pixels, moved. ~530ms, never loops. */
+  .brand-text {
+    white-space: pre;
+  }
+
+  .brand-wave {
+    position: absolute;
+    inset: 0;
+    visibility: hidden;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .brand-col {
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: pre;
+  }
+
+  .pka[data-wave] .brand-text {
+    visibility: hidden;
+  }
+
+  .pka[data-wave] .brand-wave {
+    visibility: visible;
+  }
+
+  .pka[data-wave] .brand-col {
+    animation: pka-wave 200ms step-end;
+    animation-delay: calc(var(--x) * 30ms);
+  }
+
+  .pka[data-wave='right'] .brand-col {
+    animation-delay: calc((11 - var(--x)) * 30ms);
+  }
+
+  /* One column's beat, in whole pixels: up one, up two, back to one, land. */
+  @keyframes pka-wave {
+    0% {
+      translate: 0 calc(var(--step) * -1);
+    }
+    20% {
+      translate: 0 calc(var(--step) * -2);
+    }
+    55% {
+      translate: 0 calc(var(--step) * -1);
+    }
+    80%,
+    100% {
+      translate: 0 0;
+    }
+  }
+</style>

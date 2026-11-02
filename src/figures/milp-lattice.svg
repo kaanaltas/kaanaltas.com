@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 405" fill="none" class="fig" data-fig="milp-lattice" role="img" aria-labelledby="milp-lattice-title milp-lattice-desc">
+  <title id="milp-lattice-title">MILP: a relaxation, an integer cut, and a proof</title>
+  <desc id="milp-lattice-desc">Integer program: maximize cᵀx = 4x₁ + 3x₂ over integer x₁, x₂ subject to x₁ ≥ 1, x₂ ≥ 1, x₁ + x₂ ≥ 4, 3x₁ + x₂ ≤ 19, x₁ + 3x₂ ≤ 19 and x₁ ≤ 5.5. The hatched hexagon is the LP relaxation, with vertices (1, 3), (1, 6), (4.75, 4.75), (5.5, 2.5), (5.5, 1) and (3, 1); its hollow optimum is the vertex (4.75, 4.75) with bound 33.25. Solid dots are the 22 feasible integer points, faint dots are infeasible ones; the ringed integer optimum is (5, 4) with value 32. The dashed Chvátal–Gomory cut x₁ + x₂ ≤ 9, the sum of the two ≤ 19 rows divided by 4 and rounded down, passes through (4, 5) and (5, 4), keeps every feasible integer point and removes the dithered wedge that holds the LP optimum. The faint dashed iso-objective line cᵀx = 33.25 touches the relaxation only at the LP optimum; the objective arrow c = (4, 3) stands perpendicular to it and points toward increasing cᵀx. Branch and bound on x₁ = 4.75: the child x₁ ≤ 4 has LP optimum (4, 5) with value 31, the child x₁ ≥ 5 has LP optimum (5, 4) with value 32; both are integral, so 32 is optimal and the gap to 33.25 is closed.</desc>
+  <style>
+    [data-fig="milp-lattice"] { shape-rendering: geometricPrecision; }
+    [data-fig="milp-lattice"] .s { stroke: var(--fig-ink, #1342ff); stroke-width: 1; stroke-linecap: butt; stroke-linejoin: miter; }
+    [data-fig="milp-lattice"] .i { fill: var(--fig-ink, #1342ff); }
+    [data-fig="milp-lattice"] .fl { fill: var(--fig-lit, #ffffff); }
+    [data-fig="milp-lattice"] .f1 { fill: var(--fig-100, #e6ebff); }
+    [data-fig="milp-lattice"] .f2 { fill: var(--fig-200, #b9c7fd); }
+    [data-fig="milp-lattice"] .g { stroke: var(--fig-400, #607ffd); stroke-width: 1; stroke-linecap: butt; stroke-linejoin: miter; }
+    [data-fig="milp-lattice"] .hatch { fill: url(#milp-lattice-hatch); fill-opacity: .22; }
+    [data-fig="milp-lattice"] .dither { fill: url(#milp-lattice-d25); fill-opacity: .35; }
+    [data-fig="milp-lattice"] .outside { fill-opacity: .4; }
+    [data-fig="milp-lattice"] .inside { fill-opacity: .9; }
+    [data-fig="milp-lattice"] .dash { stroke-dasharray: 4 4; }
+    [data-fig="milp-lattice"] .hero { stroke-width: 2; }
+    [data-fig="milp-lattice"] text { font-family: 'Departure Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: .02em; }
+    [data-fig="milp-lattice"] .sup { font-size: 8px; baseline-shift: super; }
+    :where(.fig-frame) [data-fig="milp-lattice"] [data-part] { opacity: 0; translate: 0 calc(var(--lift, -40) * 1px); transition: translate 820ms var(--spring-soft, cubic-bezier(.23,1,.32,1)) calc(var(--i)*110ms), opacity 400ms ease calc(var(--i)*110ms); }
+    .is-in [data-fig="milp-lattice"] [data-part], [data-fig="milp-lattice"].is-in [data-part] { opacity: 1; translate: 0 0; }
+    .is-in [data-fig="milp-lattice"] .cut-line, [data-fig="milp-lattice"].is-in .cut-line { animation: milp-lattice-cut 3.2s linear 1.4s infinite; }
+    @keyframes milp-lattice-cut { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -8; } }
+    [data-fig="milp-lattice"] .ml-fx { opacity: 0; transition: opacity 200ms cubic-bezier(.23,1,.32,1); }
+    [data-fig="milp-lattice"] .ml-fx.on { opacity: 1; }
+    [data-fig="milp-lattice"] .ml-co { transition: opacity 260ms cubic-bezier(.23,1,.32,1) 140ms; }
+    [data-fig="milp-lattice"] .ml-co.out { opacity: 0; transition: opacity 140ms cubic-bezier(.23,1,.32,1); }
+    [data-fig="milp-lattice"] .ml-ro { opacity: 0; transition: opacity 160ms cubic-bezier(.23,1,.32,1); }
+    [data-fig="milp-lattice"].ml-live .ml-ro { opacity: 1; transition: opacity 240ms cubic-bezier(.23,1,.32,1) 60ms; }
+    [data-fig="milp-lattice"] .cut-line { transition: stroke-width 200ms cubic-bezier(.23,1,.32,1); }
+    [data-fig="milp-lattice"] .cut-line.ml-hot { stroke-width: 2; }
+    [data-fig="milp-lattice"].ml-instant .ml-fx, [data-fig="milp-lattice"].ml-instant .ml-co, [data-fig="milp-lattice"].ml-instant .ml-ro, [data-fig="milp-lattice"].ml-instant .cut-line { transition: none !important; }
+    svg[data-fig="milp-lattice"] { outline: none; -webkit-tap-highlight-color: transparent; }
+    svg[data-fig="milp-lattice"]:focus-visible { outline: 2px solid var(--fig-ink, #1342ff); outline-offset: -6px; border-radius: 8px; }  /* inside the art: clear of the frame tag, >= 9 from every label */
+  </style>
+  <defs>
+    <pattern id="milp-lattice-hatch" width="10" height="10" patternUnits="userSpaceOnUse">
+      <path class="s" d="M0 10L10 0" vector-effect="non-scaling-stroke"/>
+    </pattern>
+    <pattern id="milp-lattice-d25" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect class="i" width="2" height="2"/>
+    </pattern>
+  </defs>
+  <g data-part="relaxation" style="--i:0">
+    <path class="f1" d="M130 200L130 80L280 130L310 220L310 280L210 280Z"/>
+    <path class="f2" d="M250 120L280 130L290 160Z"/>
+    <path class="hatch" d="M130 200L130 80L250 120L290 160L310 220L310 280L210 280Z"/>
+    <path class="dither" d="M250 120L280 130L290 160Z"/>
+    <path class="s" d="M130 200L130 80L280 130L310 220L310 280L210 280Z" vector-effect="non-scaling-stroke"/>
+  </g>
+  <g data-part="lattice" style="--i:1">
+    <path class="i outside" d="M131.35 280a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M131.35 240a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M171.35 280a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M171.35 80a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M211.35 80a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M251.35 80a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M291.35 120a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M291.35 80a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M331.35 280a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M331.35 240a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M331.35 200a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M331.35 120a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M331.35 80a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z"/>
+    <path class="i inside" d="M131.35 200a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M131.35 160a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M131.35 120a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M131.35 80a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M171.35 240a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M171.35 200a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M171.35 160a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M171.35 120a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M211.35 280a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M211.35 240a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M211.35 200a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M211.35 160a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M211.35 120a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M251.35 280a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M251.35 240a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M251.35 200a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M251.35 160a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M251.35 120a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M291.35 280a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M291.35 240a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M291.35 200a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z M291.35 160a1.35 1.35 0 1 1 -2.7 0a1.35 1.35 0 1 1 2.7 0Z"/>
+    <path class="i" d="M115 280L110 282.5L110 277.5Z M90 250L92.5 256L87.5 256Z"/>
+    <path class="s" d="M90 280L110 280 M90 280L90 256" vector-effect="non-scaling-stroke"/>
+    <text class="i" x="120" y="295">x₁</text>
+    <text class="i" x="80" y="240">x₂</text>
+  </g>
+  <g data-part="cut" style="--i:2">
+    <path class="s dash cut-line" d="M170 40L320 190" vector-effect="non-scaling-stroke"/>
+  </g>
+  <g data-part="objective" style="--i:3">
+    <path class="g dash" d="M220 50L292 146" vector-effect="non-scaling-stroke"/>
+    <path class="fl" d="M252.5 90a2.5 2.5 0 1 1 -5 0a2.5 2.5 0 1 1 5 0Z"/>
+    <path class="i" d="M310 45L304.9 53.2L300.7 47.6Z"/>
+    <path class="s hero" d="M252 88.5L302.8 50.4" vector-effect="non-scaling-stroke"/>
+    <path class="s" d="M252.5 90a2.5 2.5 0 1 1 -5 0a2.5 2.5 0 1 1 5 0Z M253.6 94.8L258.4 91.2L254.8 86.4" vector-effect="non-scaling-stroke"/>
+    <text class="i" x="318" y="42">c<tspan class="sup">T</tspan>x</text>
+  </g>
+  <g data-part="optima-and-labels" style="--i:4">
+    <path class="fl" d="M285 130a5 5 0 1 1 -10 0a5 5 0 1 1 10 0Z M297 160a7 7 0 1 1 -14 0a7 7 0 1 1 14 0Z"/>
+    <path class="i" d="M294 160a4 4 0 1 1 -8 0a4 4 0 1 1 8 0Z M190 60L184 62.5L184 57.5Z M130 180L124 182.5L124 177.5Z M285 130L291 132.5L291 127.5Z M297 160L303 162.5L303 157.5Z M134 345L128 347.5L128 342.5Z"/>
+    <path class="s" d="M285 130a5 5 0 1 1 -10 0a5 5 0 1 1 10 0Z M297 160a7 7 0 1 1 -14 0a7 7 0 1 1 14 0Z M55 60L184 60 M85 180L124 180 M350 130L291 130 M350 160L303 160 M100 345L128 345" vector-effect="non-scaling-stroke"/>
+    <text class="i" x="15" y="64"><tspan x="15">CUT</tspan><tspan x="15" dy="15">x₁+x₂≤9</tspan></text>
+    <text class="i" x="15" y="184"><tspan x="15">FEASIBLE</tspan><tspan x="15" dy="15">REGION</tspan></text>
+    <text class="i" x="360" y="134">LP OPTIMUM</text>
+    <text class="i" x="360" y="164"><tspan x="360">INTEGER</tspan><tspan x="360" dy="15">OPTIMUM</tspan></text>
+    <text class="i" x="15" y="349"><tspan x="15">BRANCH &amp;</tspan><tspan x="15" dy="15">BOUND</tspan></text>
+  </g>
+  <g data-part="branch-and-bound" style="--i:5">
+    <path class="fl" d="M146 345a6 6 0 1 1 -12 0a6 6 0 1 1 12 0Z M317 380a7 7 0 1 1 -14 0a7 7 0 1 1 14 0Z"/>
+    <path class="f2" d="M315 320a5 5 0 1 1 -10 0a5 5 0 1 1 10 0Z"/>
+    <path class="i" d="M314 380a4 4 0 1 1 -8 0a4 4 0 1 1 8 0Z"/>
+    <path class="s" d="M146 345H185 M185 320V380 M185 320H305 M185 380H303 M146 345a6 6 0 1 1 -12 0a6 6 0 1 1 12 0Z M315 320a5 5 0 1 1 -10 0a5 5 0 1 1 10 0Z M317 380a7 7 0 1 1 -14 0a7 7 0 1 1 14 0Z" vector-effect="non-scaling-stroke"/>
+    <text class="i" x="140" y="370" text-anchor="middle">33.25</text>
+    <text class="i" x="220" y="310">x₁ ≤ 4</text>
+    <text class="i" x="220" y="370">x₁ ≥ 5</text>
+    <text class="i" x="330" y="324">31 (4,5)</text>
+    <text class="i" x="330" y="384">32 (5,4)</text>
+  </g>
+</svg>

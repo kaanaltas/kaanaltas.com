@@ -1,0 +1,204 @@
+---
+// Academic citation row (publications and talks): title, authors with the
+// owner in bold, venue, DOI. Rail shows the venue logo or a [n] index.
+import type { LogoKey } from '../../data/cv';
+import { person } from '../../data/cv';
+import OrgLogo from './OrgLogo.astro';
+
+interface Props {
+  item: {
+    id: string;
+    authors: string[];
+    title: string;
+    venue: string;
+    details?: string;
+    year: number;
+    doi?: string;
+    href?: string;
+    logo?: LogoKey;
+  };
+  index?: number;
+  /** Small label before the title, e.g. "Oral". */
+  kind?: string;
+}
+
+const { item, index, kind } = Astro.props;
+const { id, authors, title, venue, details, year, doi, href, logo } = item;
+const link = href ?? (doi ? `https://doi.org/${doi}` : undefined);
+// A DOI reads as the citation; any other link (a conference site) as its host.
+const linkText = doi ? `doi:${doi}` : link ? new URL(link).hostname.replace(/^www\./, '') : '';
+import MicroIcon from '../MicroIcon.astro';
+---
+
+<li class="row pub" id={id} data-logo-hover>
+  {logo ? <OrgLogo logo={logo} /> : <span class="idx" aria-hidden="true">[{index ?? 1}]</span>}
+  <div class="body">
+    <h3 class="title">{title}</h3>
+    <time class="when" datetime={String(year)}>{year}</time>
+    <p class="authors">
+      {
+        authors.map((a, i) => (
+          <>
+            {a === person.name ? <strong>{a}</strong> : <span>{a}</span>}
+            {i < authors.length - 1 && ', '}
+          </>
+        ))
+      }
+    </p>
+    <p class="venue">
+      {kind && <span class="kind">{kind}</span>}
+      <cite>{venue}</cite>{details && <span class="details">, {details}</span>}
+    </p>
+    {
+      link && (
+        <p class="doi">
+          <a class="link" href={link} target="_blank" rel="noopener">
+            <MicroIcon name={doi ? 'book' : 'globe'} class="doi__book" />
+            {linkText}
+            <MicroIcon name="arrow-up-right" />
+            <span class="sr-only">(opens in a new tab)</span>
+          </a>
+        </p>
+      )
+    }
+  </div>
+</li>
+
+<style>
+  .idx {
+    display: block;
+    padding-top: 2px;
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-3);
+    text-align: center;
+  }
+
+  .body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'title when'
+      'authors authors'
+      'venue venue'
+      'doi doi';
+    column-gap: var(--s-5);
+    align-items: baseline;
+    min-width: 0;
+  }
+
+  .title {
+    grid-area: title;
+    font-size: var(--t-body);
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    color: var(--text);
+    text-wrap: pretty;
+  }
+
+  .when {
+    grid-area: when;
+    justify-self: end;
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: 1.4;
+    color: var(--text-2);
+  }
+
+  .authors {
+    grid-area: authors;
+    margin-top: 6px;
+    font-size: var(--t-sm);
+    line-height: 1.55;
+    color: var(--text-2);
+  }
+
+  .authors strong {
+    font-weight: 550;
+    color: var(--text);
+  }
+
+  .venue {
+    grid-area: venue;
+    margin-top: 2px;
+    font-size: var(--t-sm);
+    line-height: 1.55;
+    color: var(--text-2);
+    text-wrap: pretty;
+  }
+
+  cite {
+    font-style: normal;
+    color: var(--text);
+  }
+
+  .kind {
+    display: inline-block;
+    margin-right: 8px;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: var(--surface-2);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    line-height: 1.5;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-2);
+    vertical-align: 1px;
+  }
+
+  .doi {
+    grid-area: doi;
+    margin-top: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: 1.5;
+  }
+
+  .doi .link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 400;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .doi svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    color: var(--text-3);
+  }
+
+  @media (max-width: 559px) {
+    .body {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'title'
+        'authors'
+        'venue'
+        'when'
+        'doi';
+    }
+    .when {
+      justify-self: start;
+      margin-top: 4px;
+    }
+  }
+
+  @media print {
+    .doi svg {
+      display: none;
+    }
+  }
+  .doi :global(.doi__book) {
+    margin-right: 0.3em;
+    vertical-align: -0.2em;
+  }
+</style>

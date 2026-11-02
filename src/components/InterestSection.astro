@@ -1,0 +1,133 @@
+---
+// One "what I'm interested in" section: slash heading, mono tag line,
+// short prose, and optional technical figures placed between paragraphs.
+// Text keeps the prose column. Wide figures break out to --wide; compact
+// ones take the prose column, with their art at native size (480px), so
+// every label renders at about 11px on desktop.
+import Figure from './Figure.astro';
+import { inlineLinks, type Interest, type InterestFigure } from '../data/interests';
+
+interface Props {
+  interest: Interest;
+}
+
+const { interest } = Astro.props;
+const { id, title, tags, body, figures = [] } = interest;
+const headingId = `${id}-title`;
+
+// Split the prose into runs, each followed by the figure placed after it.
+const last = body.length - 1;
+const runs: { paras: string[]; figure?: InterestFigure }[] = [];
+let from = 0;
+for (const f of [...figures].sort((a, b) => (a.after ?? last) - (b.after ?? last))) {
+  const to = Math.min(f.after ?? last, last) + 1;
+  runs.push({ paras: body.slice(from, to), figure: f });
+  from = to;
+}
+if (from <= last) runs.push({ paras: body.slice(from) });
+---
+
+<section class="interest" id={id} aria-labelledby={headingId}>
+  {
+    runs.map((run, i) => (
+      <>
+        <div class="text" data-reveal>
+          {i === 0 && (
+            <>
+              <h2 class="section-title" id={headingId}>
+                <span class="slash" aria-hidden="true">/</span>
+                {title}
+              </h2>
+              <ul role="list" class="tags label" aria-label="Keywords">
+                {tags.map((t) => (
+                  <li>{t}</li>
+                ))}
+              </ul>
+            </>
+          )}
+          <div class="prose">
+            {run.paras.map((p) => (
+              <p set:html={inlineLinks(p)} />
+            ))}
+          </div>
+        </div>
+        {run.figure && (
+          <div class:list={['fig-slot', `fig-slot--${run.figure.size}`]} data-reveal>
+            <Figure
+              slug={run.figure.slug}
+              n={run.figure.n}
+              caption={run.figure.caption}
+              size={run.figure.size}
+              bleed
+            />
+          </div>
+        )}
+      </>
+    ))
+  }
+</section>
+
+<style>
+  .interest {
+    width: 100%;
+    /* Anchor links (#pse, #ml…) land below the sticky nav. */
+    scroll-margin-top: var(--s-8);
+  }
+
+  .text {
+    max-width: var(--measure);
+    margin-inline: auto;
+  }
+
+  .section-title {
+    margin-bottom: var(--s-1);
+  }
+
+  /* Every item carries a leading dot; the list is shifted left by one dot
+     width and clipped, so the dot that would start any line is hidden. */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 0 var(--s-4) -1.2em;
+    padding: 0;
+    clip-path: inset(0 0 0 1.2em);
+  }
+
+  .tags li::before {
+    content: '·' / '';
+    display: inline-block;
+    width: 1.2em;
+    text-align: center;
+    color: var(--text-3);
+    opacity: 0.6;
+  }
+
+  /* Figures sit between runs of prose, with room above and below. */
+  .fig-slot {
+    margin-block: var(--s-6);
+  }
+
+  .fig-slot:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Wide: the full --wide column. Compact: the prose column. */
+  .fig-slot--compact {
+    max-width: var(--measure);
+    margin-inline: auto;
+  }
+
+  @media (min-width: 640px) {
+    .fig-slot {
+      margin-block: var(--s-7);
+    }
+    .fig-slot--wide {
+      margin-block: var(--s-8);
+    }
+  }
+
+  /* In-view fade itself is defined once in pages/interests.astro. */
+  .fig-slot[data-reveal] {
+    transition-delay: 80ms;
+  }
+</style>

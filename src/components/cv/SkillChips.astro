@@ -1,0 +1,311 @@
+---
+// Skill chips in mono. Every language and tool carries a small glyph, gray at
+// rest; hovering the chip turns it to the brand color with a tiny spring pop.
+// Glyphs without a brand (Assembly, the HYSYS placeholder) go to the text color.
+// Full-color marks (Microsoft 365, C/C++/C#, Python, Aspen HYSYS) render as <img>
+// and go grayscale -> color instead, like the org logos.
+import type { ImageMetadata } from 'astro';
+import BrandIcon from '../BrandIcon.astro';
+
+interface Props {
+  items: readonly string[];
+  label: string;
+}
+
+const { items, label } = Astro.props;
+
+// Official full-color marks, kept as their own files: gray at rest, color on hover.
+const colorFiles = import.meta.glob<{ default: ImageMetadata }>(
+  [
+    '../../assets/icons/microsoft365.svg',
+    '../../assets/icons/c-color.svg',
+    '../../assets/icons/cpp-color.svg',
+    '../../assets/icons/csharp-color.svg',
+    '../../assets/icons/python-color.svg',
+    '../../assets/icons/hysys.svg',
+  ],
+  { eager: true },
+);
+const colorMark = (file: string) => colorFiles[`../../assets/icons/${file}`]?.default;
+const colorMarks: Record<string, ImageMetadata | undefined> = {
+  'Microsoft Office': colorMark('microsoft365.svg'),
+  C: colorMark('c-color.svg'),
+  'C++': colorMark('cpp-color.svg'),
+  'C#': colorMark('csharp-color.svg'),
+  Python: colorMark('python-color.svg'),
+  'Aspen HYSYS': colorMark('hysys.svg'),
+};
+
+// Inline marks: the original Java cup (its steam rises on hover) and the LaTeX
+// wordmark, which replaces the label text so "LaTeX" reads the way TeX sets it.
+import javaRaw from '../../assets/icons/java-color.svg?raw';
+import latexRaw from '../../assets/icons/latex-wordmark.svg?raw';
+const inlineSvg = (raw: string, cls: string) => raw.replace('<svg ', `<svg class="${cls}" aria-hidden="true" focusable="false" `);
+
+/** icon: file in src/assets/icons; size: optical size in px (solid squares read larger). */
+const brandIcon: Record<string, { icon: string; size?: number }> = {
+  JavaScript: { icon: 'javascript', size: 13 },
+  TypeScript: { icon: 'typescript', size: 13 },
+  Swift: { icon: 'swift', size: 13 },
+  Assembly: { icon: 'assembly' },
+  Shell: { icon: 'gnubash' },
+  Gurobi: { icon: 'gurobi' },
+  PyTorch: { icon: 'pytorch' },
+  TensorFlow: { icon: 'tensorflow' },
+};
+---
+
+<ul role="list" class="chips" aria-label={label}>
+  {
+    items.map((name) => {
+      const b = brandIcon[name];
+      const svgMark = colorMarks[name];
+      if (name === 'LaTeX') {
+        return (
+          <li class="chip chip--brand chip--latex">
+            <Fragment set:html={inlineSvg(latexRaw, 'latex-mark')} />
+            <span class="sr-only">LaTeX</span>
+          </li>
+        );
+      }
+      return (
+        <li class:list={['chip', { 'chip--brand': !!(b || svgMark || name === 'Java') }]}>
+          {name === 'Java' ? (
+            <span class="chip__slot" aria-hidden="true">
+              <Fragment set:html={inlineSvg(javaRaw, 'chip__icon chip__img chip__java')} />
+            </span>
+          ) : svgMark ? (
+            <span class="chip__slot" aria-hidden="true">
+              <img
+                src={svgMark.src}
+                alt=""
+                width={Math.round((14 * svgMark.width) / svgMark.height)}
+                height={14}
+                class="chip__icon chip__img"
+                decoding="async"
+              />
+            </span>
+          ) : (
+            b && (
+              <span class="chip__slot" aria-hidden="true">
+                <BrandIcon name={b.icon} size={b.size ?? 14} class="chip__icon" />
+              </span>
+            )
+          )}
+          <span>{name}</span>
+        </li>
+      );
+    })
+  }
+</ul>
+
+<style>
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    padding: 0 9px;
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    box-shadow: var(--shadow-hair);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: 1;
+    letter-spacing: 0.01em;
+    color: var(--text-2);
+    transition: color 200ms var(--ease-out);
+  }
+
+  .chip--brand {
+    padding-left: 7px;
+  }
+
+  /* Fixed 14px slot: optical sizes (13-16px) never shift the label. */
+  .chip__slot {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 14px;
+    height: 14px;
+  }
+
+  .chip :global(.chip__icon) {
+    color: var(--text-3);
+    transition:
+      color 240ms var(--ease-out),
+      translate var(--dur-bounce) var(--spring-bounce),
+      scale var(--dur-bounce) var(--spring-bounce);
+  }
+
+  :global([data-theme='dark']) .chip :global(.chip__img) {
+    filter: grayscale(1) brightness(1.45) contrast(1.05) opacity(0.85);
+  }
+
+  /* Detail paths (the Java cup's steam) wait off-stage and rise in on hover
+     (design-system section 8), staggered 0 / 50ms. */
+  .chip :global(.chip__icon .bi-detail) {
+    opacity: 0;
+    translate: 0 2px;
+    transition:
+      opacity 200ms var(--ease-out),
+      translate var(--dur-bounce) var(--spring-bounce);
+  }
+
+  .chip :global(.chip__icon .bi-detail + .bi-detail) {
+    transition-delay: 50ms;
+  }
+
+  /* Color marks (Microsoft 365, owner-supplied HYSYS PNG) (owner-supplied HYSYS PNG): gray and quiet like the glyphs. */
+  .chip :global(.chip__img) {
+    width: auto;
+    max-width: 14px;
+    height: 14px;
+    object-fit: contain;
+    /* Keep the function list identical in every state so filter interpolates. */
+    filter: grayscale(1) brightness(0.92) contrast(1.15) opacity(0.9);
+    transition:
+      filter 240ms var(--ease-out),
+      translate var(--dur-bounce) var(--spring-bounce),
+      scale var(--dur-bounce) var(--spring-bounce);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .chip--brand:hover {
+      color: var(--text);
+    }
+    .chip--brand:hover :global(.chip__icon) {
+      color: var(--brand);
+      translate: 0 -1px;
+      scale: 1.14;
+    }
+    .chip--brand:hover :global(.chip__img),
+    :global([data-theme='dark']) .chip--brand:hover :global(.chip__img) {
+      filter: grayscale(0) brightness(1) contrast(1) opacity(1);
+    }
+    .chip--brand:hover :global(.chip__icon .bi-detail) {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  /* Touch: a finger on a chip plays the same (touch-hot.ts). */
+  .chip--brand:global(.is-hot) {
+    color: var(--text);
+  }
+  .chip--brand:global(.is-hot) :global(.chip__icon) {
+    color: var(--brand);
+    translate: 0 -1px;
+    scale: 1.14;
+  }
+  .chip--brand:global(.is-hot) :global(.chip__img),
+  :global([data-theme='dark']) .chip--brand:global(.is-hot) :global(.chip__img) {
+    filter: grayscale(0) brightness(1) contrast(1) opacity(1);
+  }
+  .chip--brand:global(.is-hot) :global(.chip__icon .bi-detail) {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  /* Touch: the brand colour shows while a chip is pressed. */
+  @media (hover: none) {
+    .chip--brand:active {
+      color: var(--text);
+    }
+    .chip--brand:active :global(.chip__icon) {
+      color: var(--brand);
+      translate: 0 -1px;
+      scale: 1.14;
+    }
+    .chip--brand:active :global(.chip__img),
+    :global([data-theme='dark']) .chip--brand:active :global(.chip__img) {
+      filter: grayscale(0) brightness(1) contrast(1) opacity(1);
+    }
+    .chip--brand:active :global(.chip__icon .bi-detail) {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  /* Pale marks (the yellow HYSYS swirl) wash out in grayscale; darken them at rest. */
+  .chip :global(.chip__img--pale) {
+    filter: grayscale(1) brightness(0.62) contrast(1.15) opacity(0.9);
+  }
+
+  /* Java: the original cup; on hover the steam lifts once (design-system section 8). */
+  .chip :global(.chip__java) {
+    width: auto;
+    height: 15px;
+    max-width: 14px;
+    overflow: visible;
+  }
+
+  @keyframes steam-rise {
+    0% { translate: 0 18px; opacity: 0.2; }
+    60% { opacity: 1; }
+    100% { translate: 0 0; opacity: 1; }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .chip--brand:hover :global(.chip__java .steam) {
+      animation: steam-rise 520ms var(--spring-soft) both;
+    }
+    .chip--brand:hover :global(.chip__java .steam + .steam) {
+      animation-delay: 70ms;
+    }
+  }
+
+  .chip--brand:global(.is-hot) :global(.chip__java .steam) {
+    animation: steam-rise 520ms var(--spring-soft) both;
+  }
+  .chip--brand:global(.is-hot) :global(.chip__java .steam + .steam) {
+    animation-delay: 70ms;
+  }
+
+  /* LaTeX: the wordmark itself stands in for the label. */
+  .chip--latex {
+    padding-inline: 10px;
+  }
+
+  .chip :global(.latex-mark) {
+    display: block;
+    height: 13px;
+    width: auto;
+    color: var(--text-2);
+    transition: color 200ms var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .chip--latex:hover :global(.latex-mark) {
+      color: var(--text);
+    }
+  }
+
+  @media print {
+    .chip {
+      height: auto;
+      padding: 1pt 5pt;
+      box-shadow: inset 0 0 0 1px #ccc;
+      background: none;
+    }
+    .chip :global(.chip__icon) {
+      color: var(--brand);
+    }
+    .chip :global(.chip__img) {
+      filter: none;
+    }
+    .chip :global(.chip__icon .bi-detail) {
+      opacity: 1;
+      translate: none;
+    }
+  }
+</style>

@@ -1,0 +1,603 @@
+/* Micro-icon motion stories (docs/design-system.md §8).
+   Markup: src/lib/micro-icons.ts, rendered by MicroIcon.astro.
+
+   How the trigger works. Every interactive element resets --micro to 0 and
+   sets it to 1 while it is hovered (fine pointers only), keyboard-focused, or
+   a selected listbox option. An icon reads the value of its nearest
+   interactive ancestor through inheritance (as --m), and each moving part
+   computes its pose from it, so one rule per part covers rest and active,
+   and the transition plays both ways. The few one-shot stories (a poke, a
+   squash, a page turn) are keyframes and use the same triggers spelled out.
+
+   Rules: detail paths stay in the DOM at rest (opacity 0), spring tokens,
+   150–450ms, nothing loops. Every visitor gets the same motion: the site
+   does not follow the system's reduce-motion setting. */
+
+:is(a, button, [data-micro-trigger], [role='option']) {
+  --micro: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :is(a, button, [data-micro-trigger]):hover {
+    --micro: 1;
+  }
+}
+
+:is(a, button, [data-micro-trigger]):focus-visible,
+[role='option'][aria-selected='true'],
+.is-micro-on {
+  --micro: 1;
+}
+
+/* Touch: a press, or a row on the reading line (src/scripts/touch-hot.ts),
+   plays the story that hover plays for a mouse, its links included. */
+.is-hot,
+.is-hot :is(a, button, [data-micro-trigger]) {
+  --micro: 1;
+}
+
+.micro {
+  --m: var(--micro, 0);
+  --m-dur: 400ms;
+  display: inline-block;
+  flex: none;
+  overflow: visible;
+  transition: scale var(--dur-quick) var(--spring-quick);
+}
+
+.micro * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Press: the whole glyph gives a little. */
+:is(a, button):active .micro {
+  scale: 0.92;
+}
+
+/* Inline with running text (prose links). */
+.micro--inline {
+  display: inline-block;
+  vertical-align: -0.1875em;
+  margin-left: 0.1em;
+}
+
+/* Only visible while its trigger is active (e.g. footer links). */
+.micro--reveal {
+  opacity: var(--m);
+  transition:
+    opacity 180ms var(--ease-out),
+    scale var(--dur-quick) var(--spring-quick);
+}
+
+/* ---------------------------------------------------------------- arrows */
+
+/* → The shaft draws 3 units longer while the head nudges to meet it. */
+.micro--arrow-right .m-shaft {
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(0.186 * (1 - var(--m)));
+  /* No overshoot on a dash: a negative offset opens a gap at the tail. */
+  transition: stroke-dashoffset 300ms var(--spring-quick);
+}
+
+.micro--arrow-right .m-head {
+  translate: calc(var(--m) * 3px) 0;
+  transition: translate var(--m-dur) var(--spring-bounce);
+}
+
+/* ↗ The arrow nudges out; a short dash fades in behind its tail, sliding
+   back as it appears, so it reads as the trail the arrow left. */
+.micro--arrow-up-right .m-arrow {
+  translate: calc(var(--m) * 2px) calc(var(--m) * -2px);
+  transition: translate var(--m-dur) var(--spring-bounce);
+}
+
+.micro--arrow-up-right .m-tick {
+  opacity: calc(var(--m) * 0.75);
+  translate: calc((1 - var(--m)) * 2px) calc((1 - var(--m)) * -2px);
+  transition:
+    opacity 200ms var(--ease-out) calc(var(--m) * 60ms),
+    translate var(--m-dur) var(--spring-bounce) calc(var(--m) * 60ms);
+}
+
+/* ⤓ The arrow drops into the tray; the tray gives (keyframes, below). */
+.micro--download .m-drop {
+  translate: 0 calc(var(--m) * 2px);
+  transition: translate var(--m-dur) var(--spring-bounce);
+}
+
+.micro--download .m-tray {
+  transform-origin: 50% 100%;
+}
+
+/* ------------------------------------------------------------- objects */
+
+/* ✉ The flap folds up over the top edge; the letter's lines show inside. */
+.micro--mail .m-flap {
+  transform-origin: 50% 0;
+  scale: 1 calc(1 - var(--m) * 1.6);
+  transition: scale 380ms var(--spring-snappy);
+}
+
+.micro--mail .m-line {
+  opacity: var(--m);
+  translate: 0 calc((1 - var(--m)) * 1.5px);
+  transition:
+    opacity 160ms var(--ease-out) calc(var(--m) * 120ms),
+    translate var(--m-dur) var(--spring-bounce) calc(var(--m) * 120ms);
+}
+
+.micro--mail .m-line + .m-line {
+  transition-delay: calc(var(--m) * 170ms);
+}
+
+/* Copy: the sheets slide apart; .is-done on an ancestor draws the check. */
+.micro--copy .m-back {
+  translate: calc(var(--m) * -1px) calc(var(--m) * -1px);
+  transition: translate var(--m-dur) var(--spring-bounce);
+}
+
+.micro--copy :is(.m-front, .m-check) {
+  translate: calc(var(--m) * 1px) calc(var(--m) * 1px);
+  transition: translate var(--m-dur) var(--spring-bounce);
+}
+
+.micro--copy .m-check {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.is-done .micro--copy .m-check {
+  animation: micro-draw 400ms var(--ease-out) forwards;
+}
+
+/* ✦ Sparkle and trophy: two small stars pop in from half size. */
+:is(.micro--sparkle, .micro--trophy) .m-pop {
+  opacity: var(--m);
+  scale: calc(0.5 + var(--m) * 0.5);
+  transition:
+    opacity 160ms var(--ease-out),
+    scale var(--m-dur) var(--spring-bounce);
+}
+
+:is(.micro--sparkle, .micro--trophy) .m-pop + .m-pop {
+  transition-delay: calc(var(--m) * 70ms);
+}
+
+.micro--sparkle .m-star {
+  translate: calc(var(--m) * -1.25px) calc(var(--m) * 0.75px);
+  rotate: calc(var(--m) * 12deg);
+  transition:
+    translate var(--m-dur) var(--spring-bounce),
+    rotate 450ms var(--spring-snappy);
+}
+
+.micro--trophy .m-cup {
+  translate: 0 calc(var(--m) * -1px);
+  transition: translate var(--m-dur) var(--spring-bounce);
+}
+
+/* ⚗ Flask: three bubbles rise into place, one after another. */
+.micro--flask .m-bub {
+  opacity: var(--m);
+  translate: 0 calc((1 - var(--m)) * 3px);
+  transition:
+    opacity 160ms var(--ease-out),
+    translate var(--m-dur) var(--spring-bounce);
+}
+
+.micro--flask .m-bub:nth-of-type(4) {
+  transition-delay: calc(var(--m) * 60ms);
+}
+
+.micro--flask .m-bub:nth-of-type(5) {
+  transition-delay: calc(var(--m) * 120ms);
+}
+
+/* </> The brackets spread; the slash stays. */
+.micro--code .m-lt {
+  translate: calc(var(--m) * -1.25px) 0;
+  transition: translate var(--m-dur) var(--spring-bounce);
+}
+
+.micro--code .m-gt {
+  translate: calc(var(--m) * 1.25px) 0;
+  transition: translate var(--m-dur) var(--spring-bounce);
+}
+
+/* 📖 The page turns around the spine (keyframes, below). */
+.micro--book .m-page {
+  opacity: 0;
+  transform-origin: 0 50%;
+}
+
+/* ------------------------------------------------------ palette set */
+
+/* Shared: a stroke that writes itself on (chalk, a check, an arc).
+   Dash offsets never overshoot (quick spring or ease-out), or the dash would
+   wrap and flash a gap; opacity hides the zero-length cap at rest. */
+:is(.micro--board .m-chalk, .micro--calendar .m-check, .micro--compass .m-arc) {
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--m));
+  opacity: var(--m);
+  transition:
+    stroke-dashoffset 380ms var(--ease-out) calc(var(--m) * 60ms),
+    opacity 90ms var(--ease-out) calc(var(--m) * 60ms),
+    translate var(--m-dur) var(--spring-bounce);
+}
+
+/* ⌂ Home: the door swings open on its left hinge. The leaf (drawn over the
+   doorway) narrows towards the hinge, as a door does turning inward, and
+   swings shut again on the way back. */
+.micro--home .m-door {
+  transform-origin: 0% 100%;
+  scale: calc(1 - 0.62 * var(--m)) 1;
+  transition: scale var(--m-dur) var(--spring-snappy);
+}
+
+/* 📄 Doc: the last line writes itself out to the margin. */
+.micro--doc .m-write {
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(0.5 * (1 - var(--m)));
+  transition: stroke-dashoffset 340ms var(--spring-quick) calc(var(--m) * 40ms);
+}
+
+/* ☰ Layers: the stack fans apart, the top sheet most. */
+.micro--layers :is(.m-l1, .m-l2, .m-l3) {
+  transition: translate var(--m-dur) var(--spring-bounce);
+}
+.micro--layers .m-l1 {
+  translate: 0 calc(var(--m) * -1.5px);
+}
+.micro--layers .m-l2 {
+  translate: 0 calc(var(--m) * -0.5px);
+  transition-delay: calc(var(--m) * 30ms);
+}
+.micro--layers .m-l3 {
+  translate: 0 calc(var(--m) * 0.5px);
+  transition-delay: calc(var(--m) * 60ms);
+}
+
+/* 🎓 Cap: it lifts and tips, as if tossed; the tassel swings behind. */
+.micro--cap .m-cap {
+  translate: 0 calc(var(--m) * -1.25px);
+  rotate: calc(var(--m) * -8deg);
+  transition:
+    translate var(--m-dur) var(--spring-bounce),
+    rotate var(--m-dur) var(--spring-bounce);
+}
+.micro--cap .m-tassel {
+  transform-origin: 50% 0;
+  rotate: calc(var(--m) * 16deg);
+  transition: rotate var(--dur-bounce) var(--spring-bounce) calc(var(--m) * 50ms);
+}
+
+/* 💼 Briefcase: picked up by the handle, it swings once (keyframes). */
+.micro--briefcase .m-case {
+  transform-origin: 50% 0;
+}
+
+/* 🎤 Mic: a sound wave ripples out on each side. */
+.micro--mic .m-wave {
+  opacity: var(--m);
+  transition:
+    opacity 140ms var(--ease-out),
+    translate var(--m-dur) var(--spring-bounce);
+}
+.micro--mic .m-wave-l {
+  translate: calc((1 - var(--m)) * 1.5px) 0;
+}
+.micro--mic .m-wave-r {
+  translate: calc((1 - var(--m)) * -1.5px) 0;
+  transition-delay: calc(var(--m) * 60ms);
+}
+
+/* Chalkboard: a line of chalk writes itself across (shared rule above). */
+.micro--board .m-chalk {
+  transition-duration: 420ms, 90ms, 0s;
+}
+
+/* 📅 Calendar: the rings lift and a day is checked off. */
+.micro--calendar .m-ring {
+  translate: 0 calc(var(--m) * -0.75px);
+  transition: translate var(--m-dur) var(--spring-bounce);
+}
+.micro--calendar .m-check {
+  transition-delay: calc(var(--m) * 90ms);
+}
+
+/* 💬 Chat: three dots appear one after another, someone typing. */
+.micro--chat .m-dot {
+  opacity: var(--m);
+  scale: calc(0.4 + var(--m) * 0.6);
+  translate: 0 calc((1 - var(--m)) * 1px);
+  transition:
+    opacity 120ms var(--ease-out),
+    scale var(--m-dur) var(--spring-bounce),
+    translate var(--m-dur) var(--spring-bounce);
+}
+.micro--chat .m-dot:nth-of-type(3) {
+  transition-delay: calc(var(--m) * 70ms);
+}
+.micro--chat .m-dot:nth-of-type(4) {
+  transition-delay: calc(var(--m) * 140ms);
+}
+
+/* 🏅 Badge: the medal turns once to catch the light (keyframes). */
+
+/* ☀/☾ Theme: shows the current theme at rest and morphs to the one the
+   control switches to. --sun is 1 when the sun should show. */
+.micro--theme {
+  --sun: calc(1 - var(--m));
+}
+[data-theme='dark'] .micro--theme {
+  --sun: var(--m);
+}
+.micro--theme :is(.m-sun, .m-ray, .m-moon) {
+  transform-box: view-box;
+  transform-origin: 12px 12px;
+}
+.micro--theme .m-sun {
+  rotate: calc((1 - var(--sun)) * 45deg);
+  transition: rotate 500ms var(--spring-snappy);
+}
+.micro--theme .m-core {
+  opacity: var(--sun);
+  scale: calc(0.5 + var(--sun) * 0.5);
+  transition:
+    opacity 140ms var(--ease-out),
+    scale var(--m-dur) var(--spring-bounce);
+}
+.micro--theme .m-ray {
+  opacity: var(--sun);
+  scale: calc(0.45 + var(--sun) * 0.55);
+  transition:
+    opacity 120ms var(--ease-out) var(--d, 0ms),
+    scale var(--m-dur) var(--spring-bounce) var(--d, 0ms);
+}
+/* Rays come out one after another; they all go in together. */
+.micro--theme .m-ray:nth-of-type(3) { --d: calc(var(--sun) * 20ms); }
+.micro--theme .m-ray:nth-of-type(4) { --d: calc(var(--sun) * 40ms); }
+.micro--theme .m-ray:nth-of-type(5) { --d: calc(var(--sun) * 60ms); }
+.micro--theme .m-ray:nth-of-type(6) { --d: calc(var(--sun) * 80ms); }
+.micro--theme .m-ray:nth-of-type(7) { --d: calc(var(--sun) * 100ms); }
+.micro--theme .m-ray:nth-of-type(8) { --d: calc(var(--sun) * 120ms); }
+.micro--theme .m-ray:nth-of-type(9) { --d: calc(var(--sun) * 140ms); }
+.micro--theme .m-moon {
+  opacity: calc(1 - var(--sun));
+  scale: calc(1 - var(--sun) * 0.4);
+  rotate: calc(var(--sun) * 60deg);
+  transition:
+    opacity 140ms var(--ease-out) calc((1 - var(--sun)) * 60ms),
+    scale var(--m-dur) var(--spring-bounce) calc((1 - var(--sun)) * 60ms),
+    rotate 500ms var(--spring-snappy) calc((1 - var(--sun)) * 60ms);
+}
+
+/* ⫶ Sliders: the two knobs slide past each other. */
+.micro--sliders .m-knob-a {
+  translate: calc(var(--m) * -4.5px) 0;
+  transition: translate 450ms var(--spring-bounce);
+}
+.micro--sliders .m-knob-b {
+  translate: calc(var(--m) * 4.5px) 0;
+  transition: translate 450ms var(--spring-bounce) calc(var(--m) * 40ms);
+}
+
+/* ⚡ Bolt: it flashes (keyframes) and two sparks fly off the tip. */
+.micro--bolt .m-spark {
+  opacity: var(--m);
+  translate: calc((1 - var(--m)) * 1.25px) 0;
+  transition:
+    opacity 120ms var(--ease-out) calc(var(--m) * 80ms),
+    translate var(--m-dur) var(--spring-bounce) calc(var(--m) * 80ms);
+}
+.micro--bolt .m-spark + .m-spark {
+  transition-delay: calc(var(--m) * 130ms);
+}
+
+/* 🌐 Globe: the meridian sweeps round once, as if it spun (keyframes). */
+
+/* 📱 Phone: a notification drops in at the top of the screen. */
+.micro--phone .m-note {
+  opacity: var(--m);
+  translate: 0 calc((1 - var(--m)) * -2px);
+  transition:
+    opacity 120ms var(--ease-out),
+    translate var(--m-dur) var(--spring-bounce);
+}
+
+/* ▭ Window: a pane snaps into the left half. */
+.micro--window .m-pane {
+  transform-origin: 0 50%;
+  opacity: var(--m);
+  scale: calc(0.4 + var(--m) * 0.6) 1;
+  transition:
+    opacity 100ms var(--ease-out),
+    scale var(--m-dur) var(--spring-bounce);
+}
+
+/* Compass: the legs open and the arc between them draws. */
+.micro--compass .m-leg-l {
+  transform-origin: 100% 0;
+  rotate: calc(var(--m) * 7deg);
+  transition: rotate var(--m-dur) var(--spring-bounce);
+}
+.micro--compass .m-leg-r {
+  transform-origin: 0 0;
+  rotate: calc(var(--m) * -7deg);
+  transition: rotate var(--m-dur) var(--spring-bounce);
+}
+.micro--compass .m-arc {
+  transition-delay: calc(var(--m) * 110ms);
+}
+
+/* ---------------------------------------------------- one-shot stories */
+
+/* Each plays once when its trigger turns on and is re-armed when it turns
+   off (the animation is removed, so nothing is left half-way). The triggers
+   are spelled out because a keyframe cannot read --micro. */
+@media (hover: hover) and (pointer: fine) {
+  :is(a, button, [data-micro-trigger]):hover .micro--hand .m-hand {
+    animation: micro-poke 450ms var(--ease-out);
+  }
+  :is(a, button, [data-micro-trigger]):hover .micro--download .m-tray {
+    animation: micro-squash 380ms var(--ease-out) 90ms;
+  }
+  :is(a, button, [data-micro-trigger]):hover .micro--book .m-page {
+    animation: micro-turn 450ms var(--ease-in-out);
+  }
+  :is(a, button, [data-micro-trigger]):hover .micro--briefcase .m-case {
+    animation: micro-swing 520ms var(--ease-out);
+  }
+  :is(a, button, [data-micro-trigger]):hover .micro--badge .m-medal {
+    animation: micro-flip 460ms var(--ease-in-out);
+  }
+  :is(a, button, [data-micro-trigger]):hover .micro--globe .m-meridian {
+    animation: micro-spin 520ms var(--ease-in-out);
+  }
+  :is(a, button, [data-micro-trigger]):hover .micro--bolt .m-strike {
+    animation: micro-flash 360ms var(--ease-out);
+  }
+}
+
+:is(a, button, [data-micro-trigger]):focus-visible .micro--hand .m-hand,
+[role='option'][aria-selected='true'] .micro--hand .m-hand,
+.is-micro-on .micro--hand .m-hand {
+  animation: micro-poke 450ms var(--ease-out);
+}
+
+:is(a, button, [data-micro-trigger]):focus-visible .micro--download .m-tray,
+[role='option'][aria-selected='true'] .micro--download .m-tray,
+.is-micro-on .micro--download .m-tray {
+  animation: micro-squash 380ms var(--ease-out) 90ms;
+}
+
+:is(a, button, [data-micro-trigger]):focus-visible .micro--book .m-page,
+[role='option'][aria-selected='true'] .micro--book .m-page,
+.is-micro-on .micro--book .m-page {
+  animation: micro-turn 450ms var(--ease-in-out);
+}
+
+:is(a, button, [data-micro-trigger]):focus-visible .micro--briefcase .m-case,
+[role='option'][aria-selected='true'] .micro--briefcase .m-case,
+.is-micro-on .micro--briefcase .m-case {
+  animation: micro-swing 520ms var(--ease-out);
+}
+
+:is(a, button, [data-micro-trigger]):focus-visible .micro--badge .m-medal,
+[role='option'][aria-selected='true'] .micro--badge .m-medal,
+.is-micro-on .micro--badge .m-medal {
+  animation: micro-flip 460ms var(--ease-in-out);
+}
+
+:is(a, button, [data-micro-trigger]):focus-visible .micro--globe .m-meridian,
+[role='option'][aria-selected='true'] .micro--globe .m-meridian,
+.is-micro-on .micro--globe .m-meridian {
+  animation: micro-spin 520ms var(--ease-in-out);
+}
+
+:is(a, button, [data-micro-trigger]):focus-visible .micro--bolt .m-strike,
+[role='option'][aria-selected='true'] .micro--bolt .m-strike,
+.is-micro-on .micro--bolt .m-strike {
+  animation: micro-flash 360ms var(--ease-out);
+}
+
+/* A row that was already selected before a re-render (typing, copy, theme)
+   keeps its pose without replaying its one-shot (palette.ts sets this). */
+.is-settled .micro *:not(.m-check) {
+  animation: none !important;
+}
+
+/* Two pokes toward whatever the finger points at. */
+@keyframes micro-poke {
+  25% {
+    translate: 2px 0;
+  }
+  50% {
+    translate: 0 0;
+  }
+  72% {
+    translate: 1.25px 0;
+  }
+}
+
+/* The tray takes the arrow's weight and springs back. */
+@keyframes micro-squash {
+  45% {
+    scale: 1.05 0.8;
+  }
+  75% {
+    scale: 0.99 1.04;
+  }
+}
+
+/* One page lifts off the right leaf, turns over the spine, lands left. */
+@keyframes micro-turn {
+  0% {
+    opacity: 1;
+    scale: 1 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: -1 1;
+  }
+}
+
+/* Lifted by the handle: a swing one way, a smaller one back, still. */
+@keyframes micro-swing {
+  22% {
+    translate: 0 -0.75px;
+    rotate: -7deg;
+  }
+  50% {
+    translate: 0 -0.75px;
+    rotate: 4.5deg;
+  }
+  75% {
+    translate: 0 -0.25px;
+    rotate: -1.5deg;
+  }
+}
+
+/* The medal turns edge-on and back, with a little overshoot. */
+@keyframes micro-flip {
+  45% {
+    scale: 0.08 1;
+  }
+  82% {
+    scale: 1.06 1;
+  }
+}
+
+/* The meridian slides off one side and comes back from the other. */
+@keyframes micro-spin {
+  42% {
+    translate: 3.25px 0;
+    scale: 0.25 1;
+    opacity: 0;
+  }
+  58% {
+    translate: -3.25px 0;
+    scale: 0.25 1;
+    opacity: 0;
+  }
+}
+
+/* A flash: the bolt jumps a little bigger, dips, settles. */
+@keyframes micro-flash {
+  30% {
+    scale: 1.14;
+  }
+  65% {
+    scale: 0.96;
+  }
+}
+
+@keyframes micro-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}

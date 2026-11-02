@@ -1,0 +1,157 @@
+---
+// Organisation mark in a fixed square tile, in its own colors and still: no
+// hover lift or gray-to-color change. In dark mode branded marks sit on a
+// light tile so their colors stay legible. Decorative: the org name is always
+// in the adjacent text.
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import type { LogoKey } from '../../data/cv';
+import { brandColors } from '../../data/brands';
+import BrandIcon from '../BrandIcon.astro';
+
+const files = import.meta.glob<{ default: ImageMetadata }>('../../assets/logos/*.{svg,png}', { eager: true });
+
+// Orgs without a logo file get a small text mark instead.
+const textMarks: Partial<Record<LogoKey, { text: string; brand: string }>> = {};
+
+// Wide wordmarks (ETH is ~2.6:1) get a tighter inset so they keep an optical
+// size close to the square marks.
+const wide: Partial<Record<LogoKey, true>> = { eth: true };
+
+// Detailed multi-tone marks (the Kocaeli Fen Lisesi badge) turn to mush as a
+// faded silhouette; they rest as high-contrast grayscale instead, in both themes.
+const detailed: Partial<Record<LogoKey, true>> = { kfl: true };
+
+interface Props {
+  logo?: LogoKey;
+  /** Fallback text mark when there is no logo, e.g. "PSE". */
+  mark?: string;
+  /** Monochrome brand glyph from src/assets/icons (e.g. "google"): gray at rest, brand color on hover. */
+  glyph?: string;
+  /** Fallback line icon when there is neither logo nor mark. */
+  icon?: 'school' | 'broadcast' | 'dot';
+  size?: number;
+  class?: string;
+}
+
+const { logo, mark, glyph, icon = 'dot', size = 32, class: className } = Astro.props;
+
+let imgSrc: string | undefined;
+if (logo) {
+  const svg = files[`../../assets/logos/${logo}.svg`]?.default;
+  const png = files[`../../assets/logos/${logo}.png`]?.default;
+  if (svg) imgSrc = svg.src;
+  else if (png) imgSrc = (await getImage({ src: png, height: size * 2, format: 'webp' })).src;
+}
+const text = logo && !imgSrc ? textMarks[logo] : mark ? { text: mark, brand: 'var(--text)' } : undefined;
+const kind = imgSrc ? 'img' : text ? 'mark' : glyph ? 'glyph' : 'icon';
+// Real brand colors get a light tile on dark-mode hover so they stay legible.
+const branded = kind === 'img' || kind === 'glyph' || (kind === 'mark' && !!logo);
+const glyphBrand = glyph ? brandColors[glyph] : undefined;
+---
+
+<span
+  class:list={['org-logo', `org-logo--${kind}`, { 'is-branded': branded, 'org-logo--wide': !!(logo && wide[logo]), 'org-logo--detailed': !!(logo && detailed[logo]) }, className]}
+  style={`--size:${size}px;${text ? `--brand:${text.brand};` : ''}${glyphBrand ? `--brand:${glyphBrand};` : ''}`}
+  aria-hidden="true"
+>
+  {imgSrc && <img src={imgSrc} alt="" width={size} height={size} decoding="async" />}
+  {text && <span class="org-logo__mark">{text.text}</span>}
+  {kind === 'glyph' && glyph && <BrandIcon name={glyph} size={Math.round(size / 2)} class="org-logo__glyph" />}
+  {
+    kind === 'icon' && (
+      <svg viewBox="0 0 24 24" width="16" height="16">
+        {icon === 'school' && (
+          <>
+            <path d="M4.75 9.25 12 5.25l7.25 4" />
+            <path d="M6.25 9.75v7.5M10.25 9.75v7.5M13.75 9.75v7.5M17.75 9.75v7.5" />
+            <path d="M4.75 18.75h14.5" />
+          </>
+        )}
+        {icon === 'broadcast' && (
+          <>
+            <rect x="4.75" y="5.75" width="14.5" height="10" rx="1.5" />
+            <path d="M9.75 19.25h4.5M12 15.75v3.5" />
+            <path d="M10.75 8.75v4l3.25-2z" />
+          </>
+        )}
+        {icon === 'dot' && <circle cx="12" cy="12" r="2.25" />}
+      </svg>
+    )
+  }
+</span>
+
+<style>
+  .org-logo {
+    position: relative;
+    flex: none;
+    display: grid;
+    /* A definite 1x1 track so percentage sizes resolve and tall marks
+       (e.g. the MaCKiE PNG) are contained instead of overflowing. */
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+    place-items: center;
+    width: var(--size);
+    height: var(--size);
+    padding: 5px;
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: var(--shadow-hair);
+    color: var(--text-2);
+  }
+
+  .org-logo img {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    object-fit: contain;
+  }
+
+  .org-logo--detailed {
+    padding: 2px;
+  }
+
+  .org-logo--wide {
+    padding: 4px 3px;
+  }
+
+  .org-logo :global(.org-logo__glyph) {
+    color: var(--brand);
+  }
+
+  .org-logo__mark {
+    font-family: var(--font-pixel);
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    color: var(--brand);
+  }
+
+  .org-logo--icon svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Dark: a dark tile, except under brand colors, which get a light one. */
+  :global([data-theme='dark']) .org-logo {
+    background: var(--surface-2);
+  }
+
+  :global([data-theme='dark']) .org-logo.is-branded {
+    background: #ececee;
+  }
+
+  @media print {
+    .org-logo {
+      background: #fff !important;
+      box-shadow: 0 0 0 1px #ddd !important;
+    }
+    .org-logo__mark,
+    .org-logo :global(.org-logo__glyph) {
+      color: var(--brand) !important;
+    }
+  }
+</style>

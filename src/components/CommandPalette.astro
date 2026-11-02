@@ -1,0 +1,944 @@
+---
+// Raycast/Spotlight-style command palette. Opens with ⌘K / Ctrl+K, "/", the
+// quiet trigger in the bottom-right corner (desktop) or the search button in
+// the header (touch and narrow screens). Logic: src/scripts/palette.ts.
+import { microInner, microNames } from '../lib/micro-icons';
+import PixelKA from './PixelKA.astro';
+
+const brandRaw = import.meta.glob<string>('../assets/icons/{github,googlescholar,linkedin,x}.svg', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+const brands = Object.entries(brandRaw).map(([path, raw]) => ({
+  key: path.split('/').pop()!.replace('.svg', ''),
+  inner: raw.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, ''),
+}));
+
+// The search glyph for the field and the trigger (design-system §8 grammar).
+const searchIcon = '<circle cx="11" cy="11" r="6.25"/><path d="m15.75 15.75 3.5 3.5"/>';
+
+const suggestions = ['optimization', 'Fulbright', 'Swift'];
+---
+
+<div class="palette-spacer" aria-hidden="true"></div>
+
+<button class="palette-trigger" type="button" data-palette-open data-palette-pill-trigger aria-haspopup="dialog">
+  <svg class="trigger-icon icon icon--pop" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" set:html={searchIcon} />
+  <span class="trigger-label">Jump to…</span>
+  <span class="sr-only">(open the command palette)</span>
+  <kbd class="keys" aria-hidden="true"><span data-mod-key>⌘</span><span>K</span></kbd>
+</button>
+
+<dialog class="palette" data-palette aria-label="Command palette">
+  {/* One piece of glass: the search field, and the results it grows down
+      to show (palette.ts reveals the new height from the old one). */}
+  <div class="field">
+    <svg class="field-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" set:html={searchIcon} />
+    <input
+      data-palette-input
+      type="text"
+      role="combobox"
+      aria-expanded="true"
+      aria-controls="palette-list"
+      aria-autocomplete="list"
+      aria-label="Search pages, the CV, links and actions"
+      placeholder="Search pages, the CV, links…"
+      autocomplete="off"
+      autocapitalize="off"
+      autocorrect="off"
+      spellcheck="false"
+      enterkeyhint="go"
+      autofocus
+    />
+    <button class="close" type="button" data-palette-close>
+      <kbd class="key esc" aria-hidden="true">esc</kbd>
+      <span class="close-word" aria-hidden="true">Close</span>
+      <span class="sr-only">Close</span>
+    </button>
+  </div>
+
+  <div class="results" data-palette-scroll>
+    <span class="pill" data-palette-pill aria-hidden="true"></span>
+    <div role="listbox" id="palette-list" aria-label="Results"></div>
+  </div>
+
+  <div class="empty" data-palette-empty hidden>
+    <p class="empty-line">Nothing here for “<span data-palette-empty-q></span>” yet.</p>
+    <p class="empty-hint">
+      Try{' '}
+      {
+        suggestions.map((s, i) => (
+          <>
+            <button type="button" class="suggest" data-palette-suggest={s}>{s}</button>
+            {i < suggestions.length - 2 ? ', ' : i === suggestions.length - 2 ? ' or ' : ''}
+          </>
+        ))
+      }.
+    </p>
+  </div>
+
+  {/* Raycast's action bar: the site on the left, what ↵ does for the
+      selected row on the right (palette.ts fills in the verbs). */}
+  <footer class="bar" aria-hidden="true">
+    <span class="bar-id">
+      <span class="bar-mark"><PixelKA /></span>
+      <span class="bar-name">Kaan Altaş</span>
+    </span>
+    <span class="bar-acts">
+      <span class="bar-act" data-palette-primary>
+        <span class="bar-verb" data-palette-primary-label>Open</span>
+        <kbd class="key">↵</kbd>
+      </span>
+      <span class="bar-sep" data-palette-sep></span>
+      <span class="bar-act bar-act--2" data-palette-secondary>
+        <span class="bar-verb">Open in new tab</span>
+        <span class="keys"><kbd class="key" data-mod-key>⌘</kbd><kbd class="key">↵</kbd></span>
+      </span>
+    </span>
+  </footer>
+
+  <p class="sr-only" role="status" data-palette-status></p>
+</dialog>
+
+<template id="palette-icons">
+  {/* Every row icon is a micro-icon: its story plays when the row is selected
+      (micro.css treats a selected option like a hovered link). */}
+  {
+    microNames.map((name) => (
+      <svg
+        class={`pi micro micro--${name}`}
+        data-icon={name}
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        set:html={microInner(name)}
+      />
+    ))
+  }
+  {
+    brands.map((b) => (
+      <svg class="pi pi--brand" data-icon={b.key} viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" set:html={b.inner} />
+    ))
+  }
+</template>
+
+<script>
+  import { initPalette } from '../scripts/palette';
+  import { initWave } from '../scripts/brand';
+  initPalette();
+
+  // The action bar's pixel KA waves each time the palette opens, once the
+  // glass has settled (its clips are measured, so not mid-scale), and on hover.
+  const palette = document.querySelector<HTMLDialogElement>('[data-palette]');
+  const mark = palette?.querySelector<HTMLElement>('.bar-mark [data-pka]');
+  const wave = mark && initWave(mark, mark.closest<HTMLElement>('.bar-id') ?? mark);
+  if (palette && wave) {
+    let was = palette.open;
+    new MutationObserver(() => {
+      const now = palette.open;
+      if (now && !was)
+        requestAnimationFrame(() =>
+          Promise.all(palette.getAnimations().map((a) => a.finished)).then(
+            () => palette.open && !palette.classList.contains('is-closing') && wave('left'),
+            () => {},
+          ),
+        );
+      was = now;
+    }).observe(palette, { attributes: true, attributeFilter: ['open'] });
+  }
+</script>
+
+
+<style>
+  /* ----------------------------------------------------------- glass tokens */
+  /* The site's clear glass (global.css --glass-*), after macOS 26 Spotlight:
+     one piece of glass that is the search field and grows down to show the
+     results, with Raycast's list and action bar inside. The panel holds a
+     list of text over the page, so it takes the panel alpha and a wider blur;
+     the trigger is mostly label and takes the label alpha. One flat 1px edge,
+     a soft shadow; no lens, no rim gradient, no inner glow. The --g-* hooks
+     follow html[data-theme] through the --glass-* tokens. Text greys keep AA
+     against the worst composited background; if the translucency ever breaks
+     that, the fill gets more opaque, the text never lighter. Without
+     backdrop-filter, or under reduced transparency or more contrast, the
+     tokens turn opaque (global.css). */
+  .palette,
+  .palette-trigger {
+    --g-radius: 20px;
+    --g-pad: 6px;
+    --g-r-row: 10px;
+    --g-blur: blur(var(--glass-panel-blur)) saturate(var(--glass-saturate));
+    --g-fill: rgb(var(--glass-tint) / var(--glass-panel-alpha));
+    --g-edge: var(--glass-edge);
+    --g-shadow: var(--glass-shadow-lg);
+
+    --g-text: #161618;
+    --g-text-2: #56565b;
+    --g-text-3: #5c5c61;
+    --g-icon: #6e6e73;
+    --g-mark: var(--accent);
+    --g-line: rgb(0 0 0 / 0.07);
+    --g-bar: rgb(255 255 255 / 0.22);
+    --g-scroll: rgb(0 0 0 / 0.22);
+
+    /* Raycast's selection: the same glass a step denser, one centred hairline. */
+    --g-sel: var(--glass-sel);
+    --g-sel-shadow: inset 0 0 0 0.5px var(--glass-edge);
+
+    --g-key-text: #56565b;
+    --g-key-bg: linear-gradient(rgb(255 255 255 / 0.95), rgb(246 246 248 / 0.9));
+    --g-key-shadow: inset 0 1px 0 #fff, 0 0 0 0.5px rgb(20 20 40 / 0.16), 0 1px 2px rgb(20 20 40 / 0.08);
+
+    --g-tile-bg: linear-gradient(#fff, #f5f5f7);
+    --g-tile-shadow: inset 0 1px 0 #fff, 0 0 0 0.5px rgb(20 20 40 / 0.14), 0 1px 2px rgb(20 20 40 / 0.07);
+    --g-tile-shadow-on: inset 0 1px 0 #fff, 0 0 0 0.5px rgb(20 20 40 / 0.2), 0 2px 4px -1px rgb(20 20 40 / 0.14);
+  }
+
+  .palette-trigger {
+    --g-blur: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    --g-fill: rgb(var(--glass-tint) / var(--glass-label-alpha));
+    --g-shadow: var(--glass-shadow);
+  }
+
+  :global([data-theme='dark']) .palette,
+  :global([data-theme='dark']) .palette-trigger {
+    --g-text: #f2f2f4;
+    --g-text-2: #b1b1b6;
+    --g-text-3: #9c9ca1;
+    --g-icon: #98989d;
+    /* The dark accent a step lighter: #7b93ff is 3.8:1 on the selected row. */
+    --g-mark: #9db0ff;
+    --g-line: rgb(255 255 255 / 0.07);
+    --g-bar: rgb(0 0 0 / 0.1);
+    --g-scroll: rgb(255 255 255 / 0.22);
+
+    --g-key-text: #c2c2c7;
+    --g-key-bg: linear-gradient(rgb(255 255 255 / 0.12), rgb(255 255 255 / 0.07));
+    --g-key-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1), 0 0 0 0.5px rgb(0 0 0 / 0.6), 0 1px 2px rgb(0 0 0 / 0.3);
+
+    --g-tile-bg: linear-gradient(#3b3b41, #2c2c31);
+    --g-tile-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12), 0 0 0 0.5px rgb(0 0 0 / 0.6), 0 1px 2px rgb(0 0 0 / 0.3);
+    --g-tile-shadow-on: inset 0 1px 0 rgb(255 255 255 / 0.18), 0 0 0 0.5px rgb(0 0 0 / 0.7), 0 2px 4px -1px rgb(0 0 0 / 0.5);
+  }
+
+  /* ------------------------------------------------------------------ glass */
+  /* One material for the palette and the trigger. */
+  .palette,
+  .palette-trigger {
+    color: var(--g-text);
+    background: var(--g-fill);
+    -webkit-backdrop-filter: var(--g-blur);
+    backdrop-filter: var(--g-blur);
+    box-shadow: var(--g-shadow);
+  }
+
+  /* The edge: one flat 1px line, drawn over the content so the field and the
+     list never cover it. */
+  .palette::before,
+  .palette-trigger::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px var(--g-edge);
+    pointer-events: none;
+  }
+
+  /* ---------------------------------------------------------------- trigger */
+  /* In-flow room at the end of the page so the fixed trigger never sits on
+     top of the footer's last links. The one-screen landing page opts out. */
+  .palette-spacer {
+    flex: none;
+    height: 32px;
+  }
+
+  :global(body.bare) .palette-spacer {
+    display: none;
+  }
+
+  /* A small piece of the same glass. */
+  .palette-trigger {
+    position: fixed;
+    right: max(var(--gutter), env(safe-area-inset-right));
+    bottom: max(var(--gutter), env(safe-area-inset-bottom));
+    z-index: 30;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    padding: 0 7px 0 11px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1;
+    color: var(--g-text-2);
+    transition:
+      color 200ms var(--ease-out),
+      opacity 200ms var(--ease-out),
+      translate 240ms var(--ease-out),
+      scale var(--dur-quick) var(--spring-quick);
+  }
+
+  /* Tucked away while the reader scrolls down (palette.ts), so it never sits
+     on top of the text they are reading; it comes back on scroll up, at the
+     top and at the end of the page. */
+  .palette-trigger.is-tucked {
+    opacity: 0;
+    translate: 0 6px;
+    pointer-events: none;
+  }
+
+  .palette-trigger:active {
+    scale: 0.96;
+  }
+
+  .trigger-icon {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    color: var(--g-icon);
+    transition:
+      color 200ms var(--ease-out),
+      translate var(--dur-bounce) var(--spring-bounce),
+      scale var(--dur-bounce) var(--spring-bounce);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .palette-trigger:hover {
+      color: var(--g-text);
+    }
+    .palette-trigger:hover .trigger-icon {
+      color: var(--g-text-2);
+    }
+  }
+
+  .keys {
+    display: inline-flex;
+    gap: 2px;
+  }
+
+  /* Keycaps: small glass caps, lit from above. */
+  .keys > span,
+  .key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--g-key-text);
+    background: var(--g-key-bg);
+    box-shadow: var(--g-key-shadow);
+  }
+
+  .keys > span:first-child,
+  .key[data-mod-key] {
+    font-size: 12px;
+  }
+
+  .keys > .is-word,
+  .key.is-word {
+    font-size: 10.5px;
+  }
+
+  /* Touch and narrow screens: no floating pill (it would cover the text and
+     advertise a keyboard shortcut that isn't there). The header's search
+     button (Nav.astro) opens the palette instead. */
+  @media (max-width: 639px), (hover: none), (pointer: coarse) {
+    .palette-spacer,
+    .palette-trigger {
+      display: none;
+    }
+  }
+
+  @media print {
+    .palette-trigger {
+      display: none;
+    }
+  }
+
+  /* ----------------------------------------------------------------- dialog */
+  .palette {
+    width: min(640px, calc(100% - 2 * var(--gutter)));
+    max-width: none;
+    max-height: none;
+    margin: 15vh auto auto;
+    padding: 0;
+    border: 0;
+    border-radius: var(--g-radius);
+    overflow: hidden;
+    transform-origin: 50% 0;
+    opacity: 1;
+    scale: 1;
+    transition:
+      opacity 160ms var(--ease-out),
+      scale 300ms var(--spring-quick);
+  }
+
+  .palette[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Opening: the field fades and settles in, and palette.ts grows the glass
+     down from the field to the results. */
+  @starting-style {
+    .palette[open] {
+      opacity: 0;
+      scale: 0.97;
+    }
+  }
+
+  /* Closing is quicker than opening, and plain. */
+  .palette.is-closing {
+    opacity: 0;
+    scale: 0.98;
+    transition:
+      opacity 120ms var(--ease-exit),
+      scale 120ms var(--ease-exit);
+  }
+
+  /* Behind: the page dims a touch and goes soft. */
+  .palette::backdrop {
+    background: rgb(24 24 30 / 0.06);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    opacity: 1;
+    transition: opacity 180ms var(--ease-out);
+  }
+
+  @starting-style {
+    .palette[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  .palette.is-closing::backdrop {
+    opacity: 0;
+    transition-duration: 120ms;
+  }
+
+  :global([data-theme='dark']) .palette::backdrop {
+    background: rgb(0 0 0 / 0.3);
+  }
+
+  :global([data-palette-target]:focus) {
+    outline: none;
+  }
+
+  /* Scroll lock. html keeps `scrollbar-gutter: stable`, and ::backdrop only
+     covers the viewport inside that gutter, so with classic scrollbars the
+     empty gutter would stay bright. Tint the canvas to match the dim (body
+     paints its own background, so only the gutter shows this). */
+  :global(html:has(.palette[open])) {
+    overflow: hidden;
+    background-color: color-mix(in srgb, var(--bg) 93%, rgb(24 24 30));
+    transition: background-color 180ms var(--ease-out);
+  }
+
+  :global([data-theme='dark']:has(.palette[open])) {
+    background-color: color-mix(in srgb, var(--bg) 70%, #000);
+  }
+
+  :global(html[data-theme]:has(.palette.is-closing)) {
+    background-color: var(--bg);
+    transition-duration: 120ms;
+  }
+
+  /* ------------------------------------------------------------------ field */
+  /* The magnifier sits on the row icons' centre line (6 + 10 + 12 = 28px). */
+  .field {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 56px;
+    padding: 0 12px 0 18px;
+    border-bottom: 1px solid var(--g-line);
+  }
+
+  .field-icon {
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    color: var(--g-icon);
+  }
+
+  .field input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border: 0;
+    padding: 0;
+    background: none;
+    font: inherit;
+    font-size: 19px;
+    font-weight: 400;
+    letter-spacing: -0.011em;
+    color: var(--g-text);
+    outline: none;
+    caret-color: var(--accent);
+  }
+
+  .field input::placeholder {
+    color: var(--g-text-3);
+    opacity: 1;
+  }
+
+  .close {
+    flex: none;
+    display: grid;
+    place-items: center;
+    min-width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    color: var(--g-text-2);
+    transition: scale var(--dur-quick) var(--spring-quick);
+  }
+
+  .close:active {
+    scale: 0.94;
+  }
+
+  .close-word {
+    display: none;
+    font-size: 15px;
+  }
+
+  /* Touch screens hide keycaps, unless a hardware keyboard has been used
+     (html.kbd, an iPad with a keyboard): then it is the desktop close. */
+  @media (hover: none), (pointer: coarse) {
+    :global(html:not(.kbd)) .esc {
+      display: none;
+    }
+    :global(html:not(.kbd)) .close-word {
+      display: inline;
+    }
+    .close {
+      height: 44px;
+      padding: 0 6px;
+    }
+  }
+
+  /* ---------------------------------------------------------------- results */
+  .results {
+    position: relative;
+    isolation: isolate;
+    max-height: min(432px, 56svh);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--g-pad);
+    scrollbar-width: thin;
+    scrollbar-color: var(--g-scroll) transparent;
+  }
+
+  /* Safari (Chromium uses scrollbar-color above): a thin rounded thumb. */
+  .results::-webkit-scrollbar {
+    width: 10px;
+  }
+  .results::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .results::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background: var(--g-scroll) padding-box;
+  }
+
+  /* The selection: a quiet filled rounded rect that slides between rows
+     (palette.ts). */
+  .pill {
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: var(--g-pad);
+    right: var(--g-pad);
+    height: var(--h, 44px);
+    translate: 0 var(--y, 0);
+    border-radius: var(--g-r-row);
+    background: var(--g-sel);
+    box-shadow: var(--g-sel-shadow);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      translate 240ms var(--spring-quick),
+      opacity 120ms var(--ease-out);
+  }
+
+  .pill:global(.no-anim) {
+    transition: none;
+  }
+
+  .results :global(.grp + .grp) {
+    margin-top: 4px;
+  }
+
+  .results :global(.grp-label) {
+    padding: 10px 12px 4px;
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    color: var(--g-text-2);
+  }
+
+  .results :global(.grp:first-child .grp-label) {
+    padding-top: 6px;
+  }
+
+  .results :global(.opt) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 0 10px;
+    border-radius: var(--g-r-row);
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .results :global(.opt-icon) {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    color: var(--g-icon);
+    background: var(--g-tile-bg);
+    box-shadow: var(--g-tile-shadow);
+    transition:
+      color 150ms var(--ease-out),
+      box-shadow 150ms var(--ease-out);
+  }
+
+  .results :global(.opt-icon svg) {
+    overflow: visible;
+  }
+
+  /* Brand glyphs are filled and run edge to edge of their 24 box, while the
+     stroked micro-icons keep a 4.75 inset (about 11px of ink at 16px). At
+     12px the two carry the same optical size and weight. Selected, they pop. */
+  .results :global(.opt-icon.is-brand svg) {
+    fill: currentColor;
+    stroke: none;
+    width: 12px;
+    height: 12px;
+    transition: scale var(--dur-bounce) var(--spring-bounce);
+  }
+
+  .results :global(.opt-text) {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .results :global(.opt-title),
+  .results :global(.opt-sub) {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .results :global(.opt-title) {
+    flex: 0 1 auto;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--g-text);
+  }
+
+  .results :global(.opt-sub) {
+    flex: 1 1 0;
+    font-size: 13px;
+    color: var(--g-text-2);
+  }
+
+  /* Matched characters: the one accent inside the palette. */
+  .results :global(mark) {
+    background: none;
+    color: var(--g-mark);
+    font-weight: 560;
+  }
+
+  /* Accessories, right-aligned: the mono meta (a year, PDF, the page) and
+     the row's type label, Raycast's "Command" / "Application". */
+  .results :global(.opt-acc) {
+    flex: none;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-left: 8px;
+  }
+
+  .results :global(.opt-meta) {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    color: var(--g-text-3);
+  }
+
+  .results :global(.opt-kind) {
+    font-size: 12.5px;
+    color: var(--g-text-3);
+  }
+
+  .results :global(.opt-kind.is-copied) {
+    color: var(--g-text);
+  }
+
+  /* Trailing slot: ↗ on external rows; on on-site rows a → slides in when
+     the row is selected. Always 16px, so the type labels line up. */
+  .results :global(.opt-trail) {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    width: 16px;
+    margin-left: -2px;
+    color: var(--g-icon);
+  }
+
+  .results :global(.opt-go) {
+    opacity: 0;
+    translate: -4px 0;
+    transition:
+      opacity 120ms var(--ease-out),
+      translate 300ms var(--spring-quick);
+  }
+
+  .results :global(.opt[aria-selected='true'] .opt-go) {
+    opacity: 1;
+    translate: none;
+    color: var(--g-text-2);
+  }
+
+  .results :global(.opt[aria-selected='true'] .opt-ext) {
+    color: var(--g-text-2);
+  }
+
+  /* Selected row */
+  .results :global(.opt[aria-selected='true'] .opt-icon) {
+    color: var(--g-text);
+    box-shadow: var(--g-tile-shadow-on);
+  }
+
+  .results :global(.opt[aria-selected='true'] .opt-kind:not(.is-copied)),
+  .results :global(.opt[aria-selected='true'] .opt-meta) {
+    color: var(--g-text-2);
+  }
+
+  /* Row icons are micro-icons and play their stories from micro.css when the
+     row is selected. Brand glyphs just pop. */
+  .results :global(.opt[aria-selected='true'] .opt-icon.is-brand svg) {
+    scale: 1.1;
+  }
+  .results :global(.opt.is-settled .opt-icon.is-brand svg) {
+    transition: none;
+  }
+
+  /* Brand glyphs: gray at rest, brand color when selected (light theme). */
+  .results :global(.opt[aria-selected='true'] .opt-icon.is-brand) {
+    color: var(--g-text);
+  }
+  :global([data-theme='light']) .results :global(.opt[aria-selected='true'][data-kind='googlescholar'] .opt-icon) {
+    color: #4285f4;
+  }
+  :global([data-theme='light']) .results :global(.opt[aria-selected='true'][data-kind='linkedin'] .opt-icon) {
+    color: #0a66c2;
+  }
+
+  /* ------------------------------------------------------------ empty state */
+  .empty {
+    padding: 30px 20px 32px;
+    text-align: center;
+  }
+
+  .empty-line {
+    font-size: 14px;
+    color: var(--g-text);
+    overflow-wrap: anywhere;
+  }
+
+  .empty-hint {
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--g-text-2);
+  }
+
+  .suggest {
+    color: var(--g-text);
+    font-weight: 450;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--g-text) 28%, transparent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 200ms var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .suggest:hover {
+      text-decoration-color: var(--g-text-2);
+    }
+  }
+
+  /* ------------------------------------------------------------- action bar */
+  /* Raycast's bottom bar: the site on the left, the selected row's actions
+     on the right with their keys. */
+  .bar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 40px;
+    padding: 0 10px 0 12px;
+    border-top: 1px solid var(--g-line);
+    background: var(--g-bar);
+    font-size: 12.5px;
+    color: var(--g-text-2);
+  }
+
+  .bar-id {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .bar-mark {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    color: var(--g-text);
+    background: var(--g-tile-bg);
+    box-shadow: var(--g-tile-shadow);
+  }
+
+  .bar-name {
+    white-space: nowrap;
+  }
+
+  .bar-acts {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+  }
+
+  .bar-act {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+  }
+
+  .bar-act[hidden],
+  .bar-sep[hidden] {
+    display: none;
+  }
+
+  .bar-act:first-child .bar-verb {
+    color: var(--g-text);
+    font-weight: 500;
+  }
+
+  .bar-sep {
+    width: 1px;
+    height: 14px;
+    background: var(--g-line);
+  }
+
+  /* Geist Mono draws ↵ small; the bar's caps set it a size up. */
+  .bar .key {
+    min-width: 20px;
+    height: 20px;
+    font-size: 13px;
+  }
+
+  .bar .key.is-word {
+    font-size: 10.5px;
+  }
+
+  /* Touch: no keys to show; the bar would only take room from the list
+     above the on-screen keyboard. */
+  @media (hover: none), (pointer: coarse) {
+    :global(html:not(.kbd)) .bar {
+      display: none;
+    }
+  }
+
+  /* ----------------------------------------------------------------- mobile */
+  @media (max-width: 639px) {
+    .palette {
+      --g-radius: 18px;
+      margin-top: max(12px, env(safe-area-inset-top));
+      width: calc(100% - 2 * var(--gutter));
+    }
+    .field {
+      height: 52px;
+      gap: 10px;
+      padding-left: 16px;
+    }
+    /* 17px: at 16px or more iOS does not zoom into the field. */
+    .field input {
+      font-size: 17px;
+      letter-spacing: -0.005em;
+    }
+    /* Leave room for the on-screen keyboard under the palette. */
+    .results {
+      max-height: min(400px, 46dvh);
+    }
+    .results :global(.opt-text) {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1px;
+    }
+    .results :global(.opt-title) {
+      flex: none;
+      line-height: 1.35;
+    }
+    .results :global(.opt-sub) {
+      flex: none;
+      font-size: 12.5px;
+      line-height: 1.35;
+    }
+    .results :global(.opt) {
+      min-height: 52px;
+    }
+    /* Narrow rows give the subtitle the room; the trailing → / ↗ stays. */
+    .results :global(.opt-meta),
+    .results :global(.opt-kind:not(.is-copied)) {
+      display: none;
+    }
+    .bar-act--2,
+    .bar-sep {
+      display: none !important;
+    }
+  }
+</style>

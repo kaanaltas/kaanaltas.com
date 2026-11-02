@@ -1,0 +1,96 @@
+---
+// Small accent badge with a pixel trophy, for first-prize style highlights.
+// The trophy hops once when an ancestor [data-logo-hover] is hovered.
+interface Props {
+  text?: string;
+  class?: string;
+}
+
+const { text = '1st Prize', class: className } = Astro.props;
+
+// 12 x 10 pixel trophy, one rect per run of lit cells.
+const cells: [number, number, number][] = [
+  // [x, y, width]
+  [2, 0, 8],
+  [0, 1, 2], [3, 1, 6], [10, 1, 2],
+  [0, 2, 1], [3, 2, 6], [11, 2, 1],
+  [1, 3, 2], [3, 3, 6], [9, 3, 2],
+  [3, 4, 6],
+  [4, 5, 4],
+  [5, 6, 2],
+  [5, 7, 2],
+  [3, 8, 6],
+  [3, 9, 6],
+];
+---
+
+<span class:list={['prize', className]}>
+  <svg class="trophy" viewBox="0 0 12 10" width="12" height="10" aria-hidden="true" shape-rendering="crispEdges">
+    {cells.map(([x, y, w]) => <rect x={x} y={y} width={w} height="1" />)}
+    <rect class="glint" x="4" y="1" width="1" height="2" />
+  </svg>
+  <span class="prize__text">{text}</span>
+</span>
+
+<style>
+  .prize {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 7px 4px 6px;
+    border-radius: 5px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-family: var(--font-pixel);
+    font-size: 11px;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+
+  .trophy {
+    flex: none;
+    fill: currentColor;
+    overflow: visible;
+    transform-origin: 50% 100%;
+    transition:
+      translate var(--dur-bounce) var(--spring-bounce),
+      rotate var(--dur-bounce) var(--spring-bounce);
+  }
+
+  .glint {
+    fill: var(--accent-soft);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    :global([data-logo-hover]:hover) .trophy {
+      translate: 0 -1.5px;
+      rotate: -8deg;
+    }
+  }
+
+  /* Touch: a press, or the row on the reading line (touch-hot.ts). */
+  :global([data-logo-hover].is-hot) .trophy {
+    translate: 0 -1.5px;
+    rotate: -8deg;
+  }
+
+  @media (hover: none) {
+    :global([data-logo-hover]:active) .trophy {
+      translate: 0 -1.5px;
+      rotate: -8deg;
+    }
+  }
+
+  @media print {
+    .prize {
+      background: none;
+      box-shadow: inset 0 0 0 1px currentColor;
+    }
+    .glint {
+      fill: #fff;
+    }
+  }
+</style>

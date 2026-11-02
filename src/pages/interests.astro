@@ -1,0 +1,264 @@
+---
+import Base from '../layouts/Base.astro';
+import InterestSection from '../components/InterestSection.astro';
+import MicroIcon from '../components/MicroIcon.astro';
+import { bio, person } from '../data/cv';
+import { closing, currently, interests, intro, isoMonth } from '../data/interests';
+---
+
+<Base title={intro.title} description={`${person.name}: who I am and what I'm interested in, from process systems engineering to building software.`}>
+  <script is:inline>
+    // In-view fade. Arming (hiding) and observing live in the same script, so
+    // content can only be hidden when the code that reveals it is running too.
+    // Skipped without IntersectionObserver.
+    (() => {
+      if (!('IntersectionObserver' in window)) return;
+      const root = document.documentElement;
+      root.classList.add('js-reveal');
+      const start = () => {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (!e.isIntersecting) continue;
+              e.target.classList.add('is-visible');
+              io.unobserve(e.target);
+            }
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+        );
+        document.querySelectorAll('[data-reveal]').forEach((el) => io.observe(el));
+      };
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
+      else start();
+    })();
+  </script>
+
+  <div class="page container container--wide">
+    <header class="intro enter">
+      <h1>{intro.title}</h1>
+      <p class="lede">{intro.lede}</p>
+      <div class="prose bio">
+        {bio.map((p) => <p>{p.replace(/(\w)'(\w)/g, '$1’$2')}</p>)}
+      </div>
+    </header>
+
+    <section class="now" aria-labelledby="now-title" data-reveal>
+      <h2 class="section-title" id="now-title"><span class="slash" aria-hidden="true">/</span>Currently</h2>
+      <ul role="list" class="now-list">
+        {
+          currently.map((item) => (
+            <li class="now-row">
+              <span class="label now-kind">{item.kind}</span>
+              <p class="now-text">{item.text}</p>
+              {item.since && (
+                <span class="label now-since num">
+                  Since <time datetime={isoMonth(item.since)}>{item.since}</time>
+                </span>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <div class="interests">
+      {interests.map((interest) => <InterestSection interest={interest} />)}
+    </div>
+
+    <p class="more" data-reveal>
+      <a class="link" href="/gallery">Every drawing, in the <span class="nowrap">Gallery<MicroIcon name="arrow-right" class="micro--inline link-icon" /></span></a>
+    </p>
+
+    <footer class="outro prose" data-reveal>
+      <p class="ornament" aria-hidden="true">░░░░░░░░</p>
+      <p>{closing}</p>
+      <p>
+        <a class="mail-link" href={`mailto:${person.email}`}><MicroIcon name="hand" size={20} class="mail-hand" />{person.email}</a>
+      </p>
+    </footer>
+  </div>
+</Base>
+
+<style>
+  .page {
+    padding-block: var(--s-7) var(--s-8);
+  }
+
+  .page > * {
+    max-width: var(--measure);
+    margin-inline: auto;
+  }
+
+  .page > .interests {
+    max-width: none;
+  }
+
+  /* Header */
+  h1 {
+    font-size: var(--t-h1);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .lede {
+    margin-top: var(--s-2);
+    color: var(--text-2);
+  }
+
+  .bio {
+    margin-top: var(--s-7);
+  }
+
+  .bio p:first-child {
+    color: var(--text);
+  }
+
+  /* Currently: leerob-style hairline rows */
+  .now {
+    margin-top: var(--s-8);
+  }
+
+  .now-list {
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .now-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'kind since'
+      'text text';
+    gap: var(--s-1) var(--s-4);
+    padding-block: var(--s-4);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .now-kind {
+    grid-area: kind;
+  }
+
+  .now-since {
+    grid-area: since;
+    white-space: nowrap;
+  }
+
+  .now-text {
+    grid-area: text;
+    color: var(--text);
+    font-size: var(--t-body);
+  }
+
+  @media (min-width: 640px) {
+    .now-row {
+      grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+      grid-template-areas: 'kind text since';
+      column-gap: var(--s-5);
+      align-items: baseline;
+    }
+  }
+
+  /* Interests */
+  .interests {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-8);
+    margin-top: var(--s-8);
+  }
+
+  /* One quiet line to the Gallery, where every figure lives. */
+  .more {
+    margin-top: var(--s-8);
+  }
+
+  .more :global(.link-icon) {
+    margin-left: 0.2em;
+    color: var(--text-3);
+    transition: color 200ms var(--ease-out);
+  }
+
+  .more .link:focus-visible :global(.link-icon) {
+    color: var(--text-2);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .more .link:hover :global(.link-icon) {
+      color: var(--text-2);
+    }
+  }
+
+  .outro {
+    margin-top: var(--s-8);
+  }
+
+  /* A manicule points at the address and pokes twice on hover or focus
+     (micro.css). It sits in the link, so it is part of the target, but
+     outside the underline (inline-block). */
+  .mail-link :global(.mail-hand) {
+    margin-right: 6px;
+    vertical-align: -5px;
+    color: var(--text-3);
+    transition: color 200ms var(--ease-out);
+  }
+
+  .mail-link:focus-visible :global(.mail-hand) {
+    color: var(--text-2);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .mail-link:hover :global(.mail-hand) {
+      color: var(--text-2);
+    }
+  }
+
+  .ornament {
+    font-family: var(--font-pixel);
+    font-size: 14px;
+    line-height: 1;
+    letter-spacing: 0;
+    color: var(--text-3);
+    margin-bottom: var(--s-5);
+    user-select: none;
+  }
+
+  @media (min-width: 640px) {
+    .page {
+      padding-block: var(--s-9) var(--s-9);
+    }
+    .now,
+    .interests,
+    .outro {
+      margin-top: var(--s-10);
+    }
+    .more {
+      margin-top: var(--s-9);
+    }
+    .interests {
+      gap: var(--s-10);
+    }
+  }
+
+  /* In-view fade. Armed only when the inline script set .js-reveal on <html>,
+     which it skips without IntersectionObserver, so nothing can stay hidden.
+     Also used by InterestSection. */
+  :global(.js-reveal [data-reveal]) {
+    opacity: 0;
+    translate: 0 8px;
+    transition:
+      opacity 600ms var(--ease-out),
+      translate var(--dur-soft) var(--spring-soft);
+  }
+
+  :global(.js-reveal [data-reveal].is-visible) {
+    opacity: 1;
+    translate: none;
+  }
+
+  @media print {
+    :global(.js-reveal [data-reveal]) {
+      opacity: 1;
+      translate: none;
+    }
+  }
+</style>

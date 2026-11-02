@@ -1,0 +1,86 @@
+---
+import { meshTexJson } from '../lib/tex';
+
+// Equation-mesh background (docs/design-system.md section 7).
+// Default: a fixed, full-viewport layer behind the page. With `fixed={false}`
+// it fills its nearest positioned ancestor instead, for use inside a section
+// (give that ancestor `position: relative; isolation: isolate`).
+interface Props {
+  /** Multiplies node counts. 1 is the spec density; 0.5 is half as busy. */
+  density?: number;
+  /** Extra class names for the host element. */
+  class?: string;
+  className?: string;
+  /** Fixed full-viewport layer (default) or absolutely positioned in its parent. */
+  fixed?: boolean;
+  /** CSS selector for elements the nodes avoid. Defaults to text blocks and nav. */
+  mask?: string;
+  /** Cursor lines on fine pointers. */
+  interactive?: boolean;
+  /** Overall strength, 0 to 1, applied on top of the spec alphas. */
+  intensity?: number;
+}
+
+const { density = 1, class: cls, className, fixed = true, mask, interactive = true, intensity = 0.6 } = Astro.props;
+
+// Glyphs and equations typeset in TeX at build time (see src/lib/tex.ts).
+const tex = meshTexJson();
+---
+
+<div
+  class:list={['mesh', { 'mesh--fixed': fixed }, cls, className]}
+  aria-hidden="true"
+  data-mesh
+  data-density={density}
+  data-mask={mask}
+  data-interactive={interactive ? undefined : 'false'}
+  style={`--mesh-strength:${intensity}`}
+>
+  <canvas></canvas>
+  <script type="application/json" data-mesh-tex set:html={tex} />
+</div>
+
+<style>
+  .mesh {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 900ms var(--ease-out);
+  }
+
+  .mesh--fixed {
+    position: fixed;
+  }
+
+  .mesh.is-ready {
+    opacity: var(--mesh-strength, 0.6);
+  }
+
+  /* Light ink on a dark ground reads louder at the same alpha, so the dark
+     theme runs a little quieter to keep the same "second look" texture
+     (less so than for a sans: Computer Modern's hairlines thin out on dark). */
+  :global([data-theme='dark']) .mesh.is-ready {
+    opacity: calc(var(--mesh-strength, 0.6) * 0.88);
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* The fixed layer sits under body's content, so body must not paint over it;
+     the page background already lives on html. */
+  :global(body:has(.mesh--fixed)) {
+    background: transparent;
+  }
+</style>
+
+<script>
+  import { initMeshes } from '../scripts/mesh';
+
+  initMeshes();
+</script>

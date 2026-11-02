@@ -1,0 +1,76 @@
+---
+// A text link that knows when it leaves the site. External http(s) links
+// open in a new tab, get rel="noopener", a trailing ↗ micro-icon
+// (aria-hidden) and a visually hidden "(opens in a new tab)". The ↗ nudges
+// out on hover or keyboard focus (micro.css); with `arrow="hover"` it only
+// appears then, in the gap after the link, so it takes no space at rest.
+import MicroIcon from './MicroIcon.astro';
+
+interface Props {
+  href: string;
+  class?: string;
+  rel?: string;
+  /** Defaults to "_blank" for external http(s) links. */
+  target?: '_blank' | '_self';
+  /** "always" (default), "hover" (appears on hover/focus only) or "none". */
+  arrow?: 'always' | 'hover' | 'none';
+  [attr: string]: unknown;
+}
+
+const { href, class: className, rel, target, arrow = 'always', ...rest } = Astro.props;
+const external = /^https?:\/\//.test(href) && !href.startsWith(Astro.site?.origin ?? '\0');
+const blank = (target ?? (external ? '_blank' : undefined)) === '_blank';
+const relOut = [...new Set([...(rel?.split(/\s+/) ?? []), ...(blank ? ['noopener'] : [])])].filter(Boolean).join(' ') || undefined;
+const showArrow = external && arrow !== 'none';
+---
+
+<a
+  href={href}
+  class:list={['ext', className, { 'ext--hover': showArrow && arrow === 'hover' }]}
+  target={blank ? '_blank' : undefined}
+  rel={relOut}
+  {...rest}
+><slot />{
+    showArrow && (
+      <MicroIcon name="arrow-up-right" class:list={['ext-arrow', { 'micro--reveal': arrow === 'hover' }]} />
+    )
+  }{blank && <span class="sr-only"> (opens in a new tab)</span>}</a>
+
+<style>
+  .ext {
+    position: relative;
+  }
+
+  .ext :global(.ext-arrow) {
+    margin-left: 0.1em;
+    vertical-align: -0.1875em;
+    color: var(--text-3);
+    transition:
+      color 200ms var(--ease-out),
+      opacity 180ms var(--ease-out),
+      scale var(--dur-quick) var(--spring-quick);
+  }
+
+  .ext:focus-visible :global(.ext-arrow) {
+    color: var(--text-2);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ext:hover :global(.ext-arrow) {
+      color: var(--text-2);
+    }
+  }
+
+  /* Hover-only: the arrow sits in the gap after the link, out of the flow. */
+  .ext--hover {
+    display: inline-block;
+  }
+
+  .ext--hover :global(.ext-arrow) {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    margin-left: 1px;
+    transform: translateY(-50%);
+  }
+</style>

@@ -1,0 +1,15 @@
+// Cloudflare Workers static assets: the built site in dist/, served on
+// kaanaltas.com and www.kaanaltas.com. Deploy with `npx astro build && npx wrangler deploy`
+// from a clean checkout of main (the lab folders are gitignored but would build).
+{
+  "name": "kaanaltas",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    { "pattern": "kaanaltas.com", "custom_domain": true },
+    { "pattern": "www.kaanaltas.com", "custom_domain": true }
+  ]
+}

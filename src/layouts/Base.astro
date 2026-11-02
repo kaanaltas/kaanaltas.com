@@ -1,0 +1,163 @@
+---
+import '@fontsource-variable/inter';
+import '@fontsource-variable/geist-mono';
+import '../styles/fonts.css';
+// Inter's Latin file sets almost every word on the site: preload it so it is usually
+// in before first paint (the same hashed asset the font CSS points at).
+import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import CommandPalette from '../components/CommandPalette.astro';
+import { person, socials } from '../data/cv';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Landing page: no footer, full-bleed one-screen layout. */
+  bare?: boolean;
+}
+
+const { title, description = person.tagline, bare = false } = Astro.props;
+const fullTitle = title ? `${title} · ${person.name}` : person.name;
+// The 404 page has no canonical URL of its own.
+const notFound = Astro.url.pathname.startsWith('/404');
+const canonical = Astro.site && !notFound ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+
+// Social preview card for this page (public/og/, scripts/og-images.mjs).
+const section = Astro.url.pathname.split('/').filter(Boolean)[0] ?? 'home';
+const ogSlug = ['interests', 'work', 'cv', 'gallery'].includes(section) ? section : 'home';
+const ogImage = Astro.site ? new URL(`/og/${ogSlug}.png`, Astro.site).href : `/og/${ogSlug}.png`;
+const ogAlt = `${title ?? person.name}: ${person.name}, kaanaltas.com`;
+
+const siteUrl = Astro.site?.href;
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: person.name,
+  url: siteUrl,
+  image: Astro.site ? new URL('/og/home.png', Astro.site).href : undefined,
+  jobTitle: 'Graduate Researcher',
+  description: person.tagline,
+  affiliation: { '@type': 'CollegeOrUniversity', name: person.affiliation },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: person.affiliation },
+  knowsAbout: [
+    'Process systems engineering',
+    'Stochastic optimization',
+    'Mixed-integer programming',
+    'Machine learning',
+    'Large language models',
+    'Power-to-X',
+    'Swift',
+  ],
+  sameAs: socials.map((s) => s.href),
+};
+const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: person.name, url: siteUrl };
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogSlug === 'home' && !notFound ? 'profile' : 'website'} />
+    <meta property="og:site_name" content={person.name} />
+    <meta property="og:locale" content="en_US" />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@kaanaltas14" />
+    <meta name="twitter:creator" content="@kaanaltas14" />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={ogAlt} />
+    <meta name="author" content={person.name} />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#fcfcfc" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f0f10" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/DepartureMono-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <script is:inline>
+      // Resolve the theme before first paint. data-theme always holds the
+      // resolved value; localStorage holds an explicit user choice, if any.
+      (() => {
+        let pref = null;
+        try {
+          pref = localStorage.getItem('theme');
+        } catch {}
+        const sys = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        const theme = pref === 'light' || pref === 'dark' ? pref : sys;
+        document.documentElement.dataset.theme = theme;
+        // An explicit choice also colours the browser's own bar.
+        if (theme !== sys)
+          document.querySelectorAll('meta[name="theme-color"]').forEach((m) => {
+            m.content = theme === 'dark' ? '#0f0f10' : '#fcfcfc';
+          });
+      })();
+      // A hardware keyboard was seen earlier this session (platform.ts).
+      try {
+        if (sessionStorage.getItem('kbd') === '1') document.documentElement.classList.add('kbd');
+      } catch {}
+      // iOS Safari only applies :active (the press states) once the page
+      // listens for touches.
+      addEventListener('touchstart', () => {}, { passive: true });
+      // Arriving through a page transition: the content already fades in
+      // through it, so skip the .enter stagger (global.css).
+      addEventListener('pagereveal', (e) => {
+        if (e.viewTransition) document.documentElement.classList.add('vt-arrived');
+      });
+      // The header holds still through page transitions as its own group
+      // (global.css), but only while one runs: a named element is a Backdrop
+      // Root, and the nav's glass would then never see the page under it.
+      // Named on the way out (pageswap) and on the way in, until it ends.
+      const nameHeader = (name) => {
+        const h = document.querySelector('.site-header');
+        if (h) h.style.viewTransitionName = name;
+      };
+      addEventListener('pageswap', (e) => {
+        if (e.viewTransition) nameHeader('site-header');
+      });
+      addEventListener('pagereveal', (e) => {
+        if (!e.viewTransition) return;
+        nameHeader('site-header');
+        e.viewTransition.finished.finally(() => nameHeader(''));
+      });
+    </script>
+    <script type="application/ld+json" set:html={JSON.stringify([personLd, siteLd])} />
+    <slot name="head" />
+  </head>
+  <body class:list={[{ bare }]}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Nav />
+    <main id="main">
+      <slot />
+    </main>
+    {!bare && <Footer />}
+    <CommandPalette />
+  </body>
+</html>
+
+<script>
+  import { initTouchHot } from '../scripts/touch-hot';
+
+  initTouchHot();
+</script>
+
+<style>
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+</style>

@@ -1,0 +1,62 @@
+---
+// The footer's art (footer-art.ts): the owner's photograph of the Koç
+// University campus at Rumelifeneri, dithered at runtime. Full bleed, its
+// height following the width (the photo covers it), its top dissolving into
+// the page through the sea, its bottom dissolving above the sign-off row.
+// Decorative: hidden from assistive tech. Without WebGL2 a pre-dithered
+// still per theme shows instead (data-state="static"); the stills are only
+// fetched in that case.
+---
+
+<div class="footer-art" data-footer-art aria-hidden="true">
+  <canvas></canvas>
+  <img class="still still--light" src="/footer/koc-static-light.png" alt="" loading="lazy" decoding="async" />
+  <img class="still still--dark" src="/footer/koc-static-dark.png" alt="" loading="lazy" decoding="async" />
+</div>
+
+<style>
+  .footer-art {
+    position: relative;
+    width: 100%;
+    height: clamp(280px, 40vw, 640px);
+    overflow: hidden;
+    pointer-events: none;
+  }
+  /* Phones: a taller frame, cropped toward the tower. */
+  @media (max-width: 639px) {
+    .footer-art {
+      height: clamp(300px, 100vw, 440px);
+    }
+  }
+  /* One canvas pixel per dot cell, scaled up by whole device pixels. */
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    image-rendering: pixelated;
+  }
+  .still {
+    display: none;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50.5% 0;
+    image-rendering: pixelated;
+  }
+  .footer-art[data-state='static'] canvas {
+    display: none;
+  }
+  :global([data-theme='light']) .footer-art[data-state='static'] .still--light,
+  :global([data-theme='dark']) .footer-art[data-state='static'] .still--dark {
+    display: block;
+  }
+</style>
+
+<script>
+  import { mountFooterArt } from './footer-art';
+
+  for (const host of document.querySelectorAll<HTMLElement>('[data-footer-art]')) mountFooterArt(host);
+</script>

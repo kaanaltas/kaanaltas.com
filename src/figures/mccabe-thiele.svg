@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 616" fill="none" class="fig" data-fig="mccabe-thiele" role="img" aria-labelledby="mccabe-thiele-title mccabe-thiele-desc">
+<title id="mccabe-thiele-title">McCabe–Thiele stage construction</title>
+<desc id="mccabe-thiele-desc">McCabe–Thiele diagram for a binary distillation with constant relative volatility α = 2.5. The hero curve is the equilibrium line y = αx / (1 + (α − 1)x); the thin diagonal is y = x. Feed: z_F = 0.5, q = 0.6 (60 % liquid), so the q-line through (z_F, z_F) has slope q/(q − 1) = −1.50 and meets the equilibrium curve at the pinch (0.410, 0.635), which gives R_min = 1.180. At R = 1.4 R_min = 1.653 the rectifying operating line runs from (x_D, x_D) = (0.9, 0.9) with slope R/(R + 1) = 0.623 to its intersection with the q-line at (0.429, 0.607); the stripping line runs from there to (x_B, x_B) = (0.1, 0.1). Stepping from the top, alternately horizontal to the equilibrium curve and vertical to the active operating line, switching at the feed stage, gives 9 theoretical stages (8.97 by fractional count, reboiler included), with stage 5 as the optimal feed stage. The stair region is rasterised onto the grid underneath the exact vector staircase.</desc>
+<style>[data-fig="mccabe-thiele"] .s{stroke:var(--fig-ink,#1342ff)}[data-fig="mccabe-thiele"] .i{fill:var(--fig-ink,#1342ff)}[data-fig="mccabe-thiele"] .fl{fill:var(--fig-lit,#fff)}[data-fig="mccabe-thiele"] .f1{fill:var(--fig-100,#e6ebff)}[data-fig="mccabe-thiele"] .f3{fill:var(--fig-300,#97acff)}[data-fig="mccabe-thiele"] .g{stroke:var(--fig-400,#607ffd)}
+[data-fig="mccabe-thiele"] path{stroke-linecap:butt;stroke-linejoin:miter}[data-fig="mccabe-thiele"] text{font-family:'Departure Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.02em}[data-fig="mccabe-thiele"] .sub{font-size:8px}[data-fig="mccabe-thiele"] .d{fill-opacity:.35}
+:where(.fig-frame) [data-fig="mccabe-thiele"] [data-part]{opacity:0;translate:0 calc(var(--lift,-40)*1px);transition:translate 820ms var(--spring-soft,cubic-bezier(.23,1,.32,1)) calc(var(--i)*110ms),opacity 400ms ease calc(var(--i)*110ms)}
+.is-in [data-fig="mccabe-thiele"] [data-part],[data-fig="mccabe-thiele"].is-in [data-part]{opacity:1;translate:0 0}
+.is-in [data-fig="mccabe-thiele"] .stg,[data-fig="mccabe-thiele"].is-in .stg{animation:mccabe-thiele-px 4s ease-in-out calc(1.4s + var(--n)*.36s) infinite}
+.is-in [data-fig="mccabe-thiele"] .tg,[data-fig="mccabe-thiele"].is-in .tg{animation:mccabe-thiele-tg 4s ease-in-out calc(1.4s + var(--n)*.36s) infinite}
+@keyframes mccabe-thiele-px{0%,24%,100%{fill:var(--fig-300,#97acff)}8%{fill:var(--fig-400,#607ffd)}}
+@keyframes mccabe-thiele-tg{0%,24%,100%{fill:var(--fig-lit,#fff)}8%{fill:var(--fig-300,#97acff)}}
+[data-fig="mccabe-thiele"] .mt-off{animation:none!important}[data-fig="mccabe-thiele"] .mt-hd{opacity:0;transition:opacity 240ms var(--ease-out,cubic-bezier(.23,1,.32,1))}[data-fig="mccabe-thiele"].mt-live .mt-hd{opacity:1;transition:opacity 140ms var(--ease-out,cubic-bezier(.23,1,.32,1))}[data-fig="mccabe-thiele"] .mt-co{transition:opacity 240ms var(--ease-out,cubic-bezier(.23,1,.32,1)) 120ms}[data-fig="mccabe-thiele"].mt-live .mt-co{opacity:0;transition:opacity 140ms var(--ease-out,cubic-bezier(.23,1,.32,1))}[data-fig="mccabe-thiele"] .mt-in{transition:opacity 180ms var(--ease-out,cubic-bezier(.23,1,.32,1))}[data-fig="mccabe-thiele"].mt-snap .mt-co,[data-fig="mccabe-thiele"].mt-snap .mt-hd,[data-fig="mccabe-thiele"].mt-snap .mt-in{transition:none!important}svg[data-fig="mccabe-thiele"]{-webkit-tap-highlight-color:transparent}svg[data-fig="mccabe-thiele"]:focus{outline:none}[data-figure]:has(svg[data-fig="mccabe-thiele"]:focus-visible){outline:2px solid var(--fig-ink,#1342ff);outline-offset:3px}</style>
+<defs><pattern id="mccabe-thiele-grid" x="230" y="50" width="10" height="10" patternUnits="userSpaceOnUse"><path class="g" d="M0 .5H10M.5 0V10"/></pattern><pattern id="mccabe-thiele-d50" x="230.5" y="50.5" width="10" height="10" patternUnits="userSpaceOnUse"><path class="i" d="M.5 .5h2v2h-2ZM4.5 .5h2v2h-2ZM2.5 2.5h2v2h-2ZM6.5 2.5h2v2h-2ZM.5 4.5h2v2h-2ZM4.5 4.5h2v2h-2ZM2.5 6.5h2v2h-2ZM6.5 6.5h2v2h-2Z"/></pattern></defs>
+<g data-part="" style="--i:0;--lift:0">
+<rect x="230" y="50" width="500" height="500" fill="url(#mccabe-thiele-grid)" opacity=".13"/>
+<path class="g" opacity=".3" vector-effect="non-scaling-stroke" d="M280 50V550M330 50V550M380 50V550M430 50V550M480 50V550M530 50V550M580 50V550M630 50V550M680 50V550M230 500H730M230 450H730M230 400H730M230 350H730M230 300H730M230 250H730M230 200H730M230 150H730M230 100H730M230 50H730V550"/>
+<path class="g" opacity=".55" vector-effect="non-scaling-stroke" d="M230 50V550"/>
+<path class="s" vector-effect="non-scaling-stroke" d="M230 550H730M230 550v6M730 550v6M230 50h-6"/>
+</g>
+<g data-part="" style="--i:1;--lift:-30">
+<path class="s" vector-effect="non-scaling-stroke" d="M230 550L730 50"/>
+<path class="s" stroke-width="2" vector-effect="non-scaling-stroke" d="M230 550C233.33 541.67 236.67 533.58 240 525.73C245 513.95 250 502.68 255 491.86C263.33 473.83 271.67 457.06 280 441.3C291.67 419.25 303.33 399.2 315 380.68C328.33 359.51 341.67 340.36 355 322.73C371.67 300.69 388.33 281.03 405 263.11C425 241.62 445 222.62 465 205.43C486.67 186.79 508.33 170.27 530 155.26C555 137.95 580 122.66 605 108.82C626.67 96.83 648.33 85.93 670 75.86C690 66.57 710 58 730 50"/>
+</g>
+<g data-part="" style="--i:2;--lift:-20">
+<path class="f1" d="M280.5 490.5h9v9h-9ZM300.5 460.5h9v9h-9ZM310.5 380.5h9v9h-9ZM310.5 390.5h9v9h-9ZM310.5 400.5h9v9h-9ZM310.5 410.5h9v9h-9ZM310.5 420.5h9v9h-9ZM310.5 430.5h9v9h-9ZM310.5 440.5h9v9h-9ZM320.5 370.5h9v9h-9ZM330.5 370.5h9v9h-9ZM340.5 370.5h9v9h-9ZM350.5 370.5h9v9h-9ZM350.5 380.5h9v9h-9ZM360.5 310.5h9v9h-9ZM370.5 310.5h9v9h-9ZM370.5 350.5h9v9h-9ZM380.5 310.5h9v9h-9ZM390.5 310.5h9v9h-9ZM390.5 320.5h9v9h-9ZM410.5 290.5h9v9h-9ZM430.5 230.5h9v9h-9ZM430.5 260.5h9v9h-9ZM440.5 230.5h9v9h-9ZM450.5 230.5h9v9h-9ZM460.5 230.5h9v9h-9ZM490.5 210.5h9v9h-9ZM500.5 170.5h9v9h-9ZM510.5 170.5h9v9h-9ZM510.5 200.5h9v9h-9ZM520.5 170.5h9v9h-9ZM530.5 170.5h9v9h-9ZM540.5 170.5h9v9h-9ZM540.5 180.5h9v9h-9ZM560.5 130.5h9v9h-9ZM570.5 130.5h9v9h-9ZM580.5 130.5h9v9h-9ZM590.5 130.5h9v9h-9ZM590.5 150.5h9v9h-9ZM600.5 130.5h9v9h-9ZM610.5 130.5h9v9h-9ZM620.5 130.5h9v9h-9ZM670.5 100.5h9v9h-9Z"/><path class="d" fill="url(#mccabe-thiele-d50)" d="M280.5 490.5h9v9h-9ZM300.5 460.5h9v9h-9ZM310.5 380.5h9v9h-9ZM310.5 390.5h9v9h-9ZM310.5 400.5h9v9h-9ZM310.5 410.5h9v9h-9ZM310.5 420.5h9v9h-9ZM310.5 430.5h9v9h-9ZM310.5 440.5h9v9h-9ZM320.5 370.5h9v9h-9ZM330.5 370.5h9v9h-9ZM340.5 370.5h9v9h-9ZM350.5 370.5h9v9h-9ZM350.5 380.5h9v9h-9ZM360.5 310.5h9v9h-9ZM370.5 310.5h9v9h-9ZM370.5 350.5h9v9h-9ZM380.5 310.5h9v9h-9ZM390.5 310.5h9v9h-9ZM390.5 320.5h9v9h-9ZM410.5 290.5h9v9h-9ZM430.5 230.5h9v9h-9ZM430.5 260.5h9v9h-9ZM440.5 230.5h9v9h-9ZM450.5 230.5h9v9h-9ZM460.5 230.5h9v9h-9ZM490.5 210.5h9v9h-9ZM500.5 170.5h9v9h-9ZM510.5 170.5h9v9h-9ZM510.5 200.5h9v9h-9ZM520.5 170.5h9v9h-9ZM530.5 170.5h9v9h-9ZM540.5 170.5h9v9h-9ZM540.5 180.5h9v9h-9ZM560.5 130.5h9v9h-9ZM570.5 130.5h9v9h-9ZM580.5 130.5h9v9h-9ZM590.5 130.5h9v9h-9ZM590.5 150.5h9v9h-9ZM600.5 130.5h9v9h-9ZM610.5 130.5h9v9h-9ZM620.5 130.5h9v9h-9ZM670.5 100.5h9v9h-9Z"/>
+<path class="f3 stg" style="--n:0" d="M620.5 100.5h9v9h-9ZM620.5 110.5h9v9h-9ZM620.5 120.5h9v9h-9ZM630.5 100.5h9v9h-9ZM630.5 110.5h9v9h-9ZM630.5 120.5h9v9h-9ZM640.5 100.5h9v9h-9ZM640.5 110.5h9v9h-9ZM650.5 100.5h9v9h-9ZM650.5 110.5h9v9h-9ZM660.5 100.5h9v9h-9Z"/>
+<path class="f3 stg" style="--n:1" d="M560.5 140.5h9v9h-9ZM560.5 150.5h9v9h-9ZM560.5 160.5h9v9h-9ZM570.5 140.5h9v9h-9ZM570.5 150.5h9v9h-9ZM570.5 160.5h9v9h-9ZM580.5 140.5h9v9h-9ZM580.5 150.5h9v9h-9ZM590.5 140.5h9v9h-9ZM600.5 140.5h9v9h-9Z"/>
+<path class="f3 stg" style="--n:2" d="M500.5 180.5h9v9h-9ZM500.5 190.5h9v9h-9ZM500.5 200.5h9v9h-9ZM510.5 180.5h9v9h-9ZM510.5 190.5h9v9h-9ZM520.5 180.5h9v9h-9ZM520.5 190.5h9v9h-9ZM530.5 180.5h9v9h-9Z"/>
+<path class="f3 stg" style="--n:3" d="M460.5 210.5h9v9h-9ZM460.5 220.5h9v9h-9ZM470.5 210.5h9v9h-9ZM470.5 220.5h9v9h-9ZM480.5 210.5h9v9h-9Z"/>
+<path class="f3 stg" style="--n:4" d="M430.5 240.5h9v9h-9ZM430.5 250.5h9v9h-9ZM440.5 240.5h9v9h-9Z"/>
+<path class="f3 stg" style="--n:5" d="M400.5 270.5h9v9h-9ZM400.5 280.5h9v9h-9ZM400.5 290.5h9v9h-9ZM400.5 300.5h9v9h-9ZM410.5 270.5h9v9h-9ZM410.5 280.5h9v9h-9ZM420.5 270.5h9v9h-9Z"/>
+<path class="f3 stg" style="--n:6" d="M360.5 320.5h9v9h-9ZM360.5 330.5h9v9h-9ZM360.5 340.5h9v9h-9ZM360.5 350.5h9v9h-9ZM360.5 360.5h9v9h-9ZM370.5 320.5h9v9h-9ZM370.5 330.5h9v9h-9ZM370.5 340.5h9v9h-9ZM380.5 320.5h9v9h-9ZM380.5 330.5h9v9h-9Z"/>
+<path class="f3 stg" style="--n:7" d="M320.5 380.5h9v9h-9ZM320.5 390.5h9v9h-9ZM320.5 400.5h9v9h-9ZM320.5 410.5h9v9h-9ZM320.5 420.5h9v9h-9ZM330.5 380.5h9v9h-9ZM330.5 390.5h9v9h-9ZM330.5 400.5h9v9h-9ZM330.5 410.5h9v9h-9ZM340.5 380.5h9v9h-9ZM340.5 390.5h9v9h-9Z"/>
+<path class="f3 stg" style="--n:8" d="M280.5 440.5h9v9h-9ZM280.5 450.5h9v9h-9ZM280.5 460.5h9v9h-9ZM280.5 470.5h9v9h-9ZM280.5 480.5h9v9h-9ZM290.5 440.5h9v9h-9ZM290.5 450.5h9v9h-9ZM290.5 460.5h9v9h-9ZM290.5 470.5h9v9h-9ZM300.5 440.5h9v9h-9ZM300.5 450.5h9v9h-9Z"/>
+</g>
+<g data-part="" style="--i:3;--lift:-30">
+<path class="s" vector-effect="non-scaling-stroke" d="M680 100L444.48 246.73L280 500M480 300L435.07 232.6"/>
+<path class="g" stroke-dasharray="2 3" vector-effect="non-scaling-stroke" d="M280 504V550M480 304V550M680 104V550"/>
+<path class="s" vector-effect="non-scaling-stroke" d="M680 100H621.3V136.57H558.2V175.88H501.56V211.17H458.4V238.06H429.43V269.91H398.76V317.14H359.27V377.95H316.73V443.45H278.87V501.13"/>
+<path class="fl" d="M619.3 100a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM556.2 136.57a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM499.56 175.88a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM456.4 211.17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM427.43 238.06a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM396.76 269.91a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM357.27 317.14a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM314.73 377.95a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM276.87 443.45a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM619.3 136.57a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM556.2 175.88a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM499.56 211.17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM456.4 238.06a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM427.43 269.91a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM396.76 317.14a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM357.27 377.95a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM314.73 443.45a2 2 0 1 0 4 0a2 2 0 1 0 -4 0Z"/><path class="s" vector-effect="non-scaling-stroke" d="M619.3 100a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM556.2 136.57a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM499.56 175.88a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM456.4 211.17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM427.43 238.06a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM396.76 269.91a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM357.27 317.14a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM314.73 377.95a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM276.87 443.45a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM619.3 136.57a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM556.2 175.88a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM499.56 211.17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM456.4 238.06a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM427.43 269.91a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM396.76 317.14a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM357.27 377.95a2 2 0 1 0 4 0a2 2 0 1 0 -4 0ZM314.73 443.45a2 2 0 1 0 4 0a2 2 0 1 0 -4 0Z"/>
+<path class="fl" d="M276.5 500a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0ZM476.5 300a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0ZM676.5 100a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0Z"/><path class="s" vector-effect="non-scaling-stroke" d="M276.5 500a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0ZM476.5 300a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0ZM676.5 100a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0Z"/><path class="i" d="M276.5 550a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0ZM476.5 550a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0ZM676.5 550a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0Z"/>
+</g>
+<g data-part="" style="--i:4;--lift:-20">
+<path class="fl tg" style="--n:0" d="M606.76 87.62a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/><path class="s" vector-effect="non-scaling-stroke" d="M606.76 87.62a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/>
+<text class="i" x="614.76" y="91.62" text-anchor="middle">1</text>
+<path class="fl tg" style="--n:1" d="M542.7 124.75a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/><path class="s" vector-effect="non-scaling-stroke" d="M542.7 124.75a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/>
+<text class="i" x="550.7" y="128.75" text-anchor="middle">2</text>
+<path class="fl tg" style="--n:2" d="M485.1 164.73a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/><path class="s" vector-effect="non-scaling-stroke" d="M485.1 164.73a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/>
+<text class="i" x="493.1" y="168.73" text-anchor="middle">3</text>
+<path class="fl tg" style="--n:3" d="M441.15 200.66a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/><path class="s" vector-effect="non-scaling-stroke" d="M441.15 200.66a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/>
+<text class="i" x="449.15" y="204.66" text-anchor="middle">4</text>
+<path class="i" d="M411.64 228.05a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/>
+<text class="fl" x="419.64" y="232.05" text-anchor="middle">5</text>
+<path class="fl tg" style="--n:5" d="M380.39 260.5a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/><path class="s" vector-effect="non-scaling-stroke" d="M380.39 260.5a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/>
+<text class="i" x="388.39" y="264.5" text-anchor="middle">6</text>
+<path class="fl tg" style="--n:6" d="M340.18 308.59a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/><path class="s" vector-effect="non-scaling-stroke" d="M340.18 308.59a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/>
+<text class="i" x="348.18" y="312.59" text-anchor="middle">7</text>
+<path class="fl tg" style="--n:7" d="M296.91 370.44a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/><path class="s" vector-effect="non-scaling-stroke" d="M296.91 370.44a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/>
+<text class="i" x="304.91" y="374.44" text-anchor="middle">8</text>
+<path class="fl tg" style="--n:8" d="M258.48 436.93a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/><path class="s" vector-effect="non-scaling-stroke" d="M258.48 436.93a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z"/>
+<text class="i" x="266.48" y="440.93" text-anchor="middle">9</text>
+</g>
+<g data-part="" style="--i:5;--lift:0">
+<path class="s" vector-effect="non-scaling-stroke" d="M770 194H535.12M770 283H474.67M770 348H384.71M143.42 475H256.77M186.74 370.44H291.41M136.2 228.05H406.14"/><path class="i" d="M530.12 194L535.12 191L535.12 197ZM469.67 283L474.67 280L474.67 286ZM379.71 348L384.71 345L384.71 351ZM261.77 475L256.77 478L256.77 472ZM296.41 370.44L291.41 373.44L291.41 367.44ZM411.14 228.05L406.14 231.05L406.14 225.05Z"/>
+<g class="i">
+<text x="780" y="198">ROP</text>
+<text x="780" y="287">q-LINE</text>
+<text x="780" y="352">SOP</text>
+<text x="54" y="479">EQUILIBRIUM</text>
+<text x="54" y="374.44">THEORETICAL STAGE</text>
+<text x="54" y="232.05">FEED STAGE</text>
+<text x="230" y="36">y (VAPOUR)</text>
+<text x="744" y="554">x (LIQUID)</text>
+<text x="220" y="54" text-anchor="end">1</text>
+<text x="220" y="554" text-anchor="end">0</text>
+<text x="730" y="572" text-anchor="middle">1</text>
+<text x="280" y="572" text-anchor="middle">x<tspan class="sub" dy="2.5">B</tspan></text>
+<text x="280" y="588" text-anchor="middle">0.10</text>
+<text x="480" y="572" text-anchor="middle">z<tspan class="sub" dy="2.5">F</tspan></text>
+<text x="480" y="588" text-anchor="middle">0.50</text>
+<text x="680" y="572" text-anchor="middle">x<tspan class="sub" dy="2.5">D</tspan></text>
+<text x="680" y="588" text-anchor="middle">0.90</text>
+<text x="780" y="440">α = 2.5</text>
+<text x="780" y="456">q = 0.6</text>
+<text x="780" y="472">R = 1.4 R<tspan class="sub" dy="2.5">min</tspan><tspan dy="-2.5"> = 1.65</tspan></text>
+<text x="780" y="488">N = 9, FEED = 5</text>
+</g></g>
+</svg>

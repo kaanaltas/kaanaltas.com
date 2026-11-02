@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" fill="none" class="fig" data-fig="compass-construction" data-replay="" role="img" aria-labelledby="compass-construction-title compass-construction-desc">
+  <title id="compass-construction-title">Compass: the construction of the KA monogram</title>
+  <desc id="compass-construction-desc">Construction board of the KA monogram. The K's leg is a circular arc centred on the A's apex; it runs on through the A as its crossbar. The apex and the K's joint are the ends of a 3-4-5 right triangle, four strokes across along the cap line and three down the stem's axis, so the hypotenuse, five strokes, is the compass radius of the arc's centreline; the arc's inner and outer circles are 26 units apart. The arm leaves the joint along a 3:4 line, the mirror of the arc's start. Dotted axes, dashed cap line, baseline and centreline, solid primary construction and hollow anchor nodes at the apex, the joint, the cap-line corner, the arm's top, the A's inner apex, the crossbar on the axis and the outer corners.</desc>
+  <style>
+    [data-fig="compass-construction"] { shape-rendering: geometricPrecision; }
+    [data-fig="compass-construction"] .s { stroke: var(--fig-ink, #1342ff); stroke-width: 1; stroke-linecap: butt; stroke-linejoin: miter; }
+    [data-fig="compass-construction"] .g { stroke: var(--fig-400, #607ffd); stroke-width: 1; stroke-linecap: butt; }
+    [data-fig="compass-construction"] .fl { fill: var(--fig-lit, #ffffff); }
+    [data-fig="compass-construction"] .f1 { fill: var(--fig-100, #e6ebff); }
+    [data-fig="compass-construction"] .aux { stroke-dasharray: 1 3; }
+    [data-fig="compass-construction"] .sec { stroke-dasharray: 6 4; }
+    [data-fig="compass-construction"] .dr { stroke-dasharray: 1 1; }
+    [data-fig="compass-construction"] .t-aux { opacity: .55; }
+    [data-fig="compass-construction"] .t-sec { opacity: .75; }
+    [data-fig="compass-construction"] .t-pri { opacity: .5; }
+    [data-fig="compass-construction"] .anc { transform-box: fill-box; transform-origin: center; }
+    /* The reveal, once, when the frame gets .is-in: transitions, so moving the figure (Quick Look) never replays it. */
+    [data-fig="compass-construction"] :is(.t-aux, .t-sec, .t-pri) { transition: opacity 700ms cubic-bezier(.77,0,.175,1) 2050ms; }
+    [data-fig="compass-construction"] .aux { transition: opacity 320ms cubic-bezier(.23,1,.32,1) calc(var(--i) * 80ms); }
+    [data-fig="compass-construction"] .sec { transition: opacity 360ms cubic-bezier(.23,1,.32,1) calc(250ms + var(--i) * 90ms); }
+    [data-fig="compass-construction"] .pri { transition: stroke-dashoffset 520ms cubic-bezier(.23,1,.32,1) calc(500ms + var(--i) * 100ms), opacity 1ms linear calc(500ms + var(--i) * 100ms); }
+    [data-fig="compass-construction"] .tick { transition: opacity 260ms ease 1000ms; }
+    [data-fig="compass-construction"] .anc { transition: scale 520ms var(--spring-bounce, cubic-bezier(.34,1.56,.64,1)) calc(1050ms + var(--i) * 45ms), opacity 160ms ease calc(1050ms + var(--i) * 45ms); }
+    [data-fig="compass-construction"] .out { transition: stroke-dashoffset 760ms cubic-bezier(.77,0,.175,1) 1250ms; }
+    [data-fig="compass-construction"] .ink { transition: opacity 460ms cubic-bezier(.23,1,.32,1) 1900ms; }
+    :where(.fig-frame) [data-fig="compass-construction"] :is(.t-aux, .t-sec, .t-pri) { opacity: 1; }
+    :where(.fig-frame) [data-fig="compass-construction"] .rv { opacity: 0; }
+    :where(.fig-frame) [data-fig="compass-construction"] .dr { stroke-dashoffset: 1; }
+    :where(.fig-frame) [data-fig="compass-construction"] .anc { scale: 0; }
+    .is-in [data-fig="compass-construction"] .t-aux, [data-fig="compass-construction"].is-in .t-aux { opacity: .55; }
+    .is-in [data-fig="compass-construction"] .t-sec, [data-fig="compass-construction"].is-in .t-sec { opacity: .75; }
+    .is-in [data-fig="compass-construction"] .t-pri, [data-fig="compass-construction"].is-in .t-pri { opacity: .5; }
+    .is-in [data-fig="compass-construction"] .rv, [data-fig="compass-construction"].is-in .rv { opacity: 1; }
+    .is-in [data-fig="compass-construction"] .dr, [data-fig="compass-construction"].is-in .dr { stroke-dashoffset: 0; }
+    .is-in [data-fig="compass-construction"] .anc, [data-fig="compass-construction"].is-in .anc { scale: 1; }
+    [data-fig="compass-construction"] :is(.lv, .lv-g) { display: none; }
+    [data-fig="compass-construction"][data-lv] :is(.ink, .out) { visibility: hidden; }
+    [data-fig="compass-construction"][data-lv="draw"] :is(.lv-draw, .lv-g),
+    [data-fig="compass-construction"][data-lv="guides"] .lv-g,
+    [data-fig="compass-construction"][data-lv="redraw"] .lv-rd { display: inline; }
+    [data-fig="compass-construction"][data-lv="guides"] :is(.ink, .out) { visibility: visible; }
+    [data-fig="compass-construction"] .lv-g { opacity: 0; }
+    [data-fig="compass-construction"] .lv-arm { stroke-width: 1.5; }
+    [data-fig="compass-construction"] :is(.lv-turn, .lv-sw) { transform-box: view-box; transform-origin: 0 0; }
+  </style>
+  <defs>
+    <clipPath id="compass-construction-c-stem" clipPathUnits="userSpaceOnUse"><path d="M75.000 30.000L75.000 -400.000L-400.000 -400.000L-400.000 640.000L76.219 640.000L76.219 189.540L60.000 154.676L60.000 154.675L60.000 125.000L60.000 75.000Z"/></clipPath>
+    <clipPath id="compass-construction-c-a" clipPathUnits="userSpaceOnUse"><path d="M720.000 -400.000L140.219 -400.000L140.219 30.000L92.773 119.970L107.707 154.445L107.707 154.445L107.707 154.445L99.443 179.236L99.443 179.236L76.219 189.540L76.219 640.000L720.000 640.000ZM127.904 188.723L136.168 163.932L136.168 163.931L136.168 163.932L165.000 147.481L193.832 163.932L193.832 163.932L193.832 163.932L193.832 163.932L202.096 188.723L165.000 255.085Z"/></clipPath>
+    <clipPath id="compass-construction-c-arm" clipPathUnits="userSpaceOnUse"><path d="M141.719 -400.000L140.219 -400.000L75.000 -400.000L73.500 -400.000L73.500 29.757L58.500 74.757L58.500 129.500L60.000 127.500L60.000 125.000L62.812 121.250L62.812 121.250L92.773 119.970L93.411 121.444L93.698 121.432L141.719 30.371Z"/></clipPath>
+    <clipPath id="compass-construction-c-arc" clipPathUnits="userSpaceOnUse"><path d="M109.311 154.375L93.739 118.427L62.038 119.782L58.500 124.500L58.500 155.007L75.480 191.508L100.657 180.338ZM195.074 162.913L165.000 145.754L134.926 162.913L126.271 188.877L165.000 258.159L203.729 188.877Z"/></clipPath>
+    <mask id="compass-construction-draw" maskUnits="userSpaceOnUse" x="-60" y="-60" width="600" height="480">
+      <g transform="scale(1.5)" fill="none" stroke="#fff" stroke-linecap="butt" stroke-dasharray="1 2" stroke-dashoffset="1">
+        <g clip-path="url(#compass-construction-c-stem)"><path class="lv-rv" data-rv="stem" d="M45 26V214" stroke-width="38" pathLength="1"/></g>
+        <g clip-path="url(#compass-construction-c-a)"><path class="lv-rv" data-rv="legL" d="M167.846 21.462L102.154 218.538" stroke-width="38" pathLength="1"/></g>
+        <g clip-path="url(#compass-construction-c-a)"><path class="lv-rv" data-rv="legR" d="M162.154 21.462L227.846 218.538" stroke-width="38" pathLength="1"/></g>
+        <g clip-path="url(#compass-construction-c-arm)"><path class="lv-rv" data-rv="arm" d="M122.7 16.4L45 120" stroke-width="38" pathLength="1"/></g>
+        <g clip-path="url(#compass-construction-c-arc)"><path class="lv-rv" data-rv="arc" d="M45 120A150 150 0 0 0 230.756 164.819" stroke-width="34" pathLength="1"/></g>
+      </g>
+    </mask>
+    <clipPath id="compass-construction-q" clipPathUnits="userSpaceOnUse"><path d="M252.172 169.504A164.5 164.5 0 0 1 23.996 114.724L48.854 99.788A135.5 135.5 0 0 0 236.804 144.911Z"/></clipPath>
+    <mask id="compass-construction-sweep" maskUnits="userSpaceOnUse" x="-4000" y="-4000" width="8000" height="8000">
+      <g transform="scale(1.5)"><g class="lv-sw"><rect x="-1035" y="30" width="2400" height="1200" fill="#fff"/></g></g>
+    </mask>
+    <mask id="compass-construction-o-rest" maskUnits="userSpaceOnUse" x="-60" y="-60" width="600" height="480">
+      <g transform="scale(1.5)"><g clip-path="url(#compass-construction-q)"><g class="lv-sw"><rect x="-1035" y="30" width="2400" height="1200" fill="#fff"/></g></g></g>
+    </mask>
+    <mask id="compass-construction-o-parts" maskUnits="userSpaceOnUse" x="-60" y="-60" width="600" height="480">
+      <rect x="-60" y="-60" width="600" height="480" fill="#fff"/>
+      <g transform="scale(1.5)"><path d="M252.172 169.504A164.5 164.5 0 0 1 23.996 114.724L48.854 99.788A135.5 135.5 0 0 0 236.804 144.911Z" fill="#000"/><g clip-path="url(#compass-construction-q)"><g class="lv-sw"><rect x="-1035" y="-1170" width="2400" height="1200" fill="#fff"/></g></g></g>
+    </mask>
+  </defs>
+  <path class="f1 ink rv" d="M90 112.5L90 45L45 45L45 315L90 315L90 232.01A244.5 244.5 0 0 0 149.16 268.85L133.78 315L181.22 315L191.86 283.08A244.5 244.5 0 0 0 303.14 283.08L313.78 315L361.22 315L271.22 45L223.78 45L161.56 231.67A205.5 205.5 0 0 1 94.22 181.88L196.88 45L140.62 45L90 112.5ZM204.25 245.9L247.5 116.15L290.75 245.9A205.5 205.5 0 0 1 204.25 245.9Z" fill-rule="evenodd"/>
+  <path class="f1 lv lv-draw" d="M90 112.5L90 45L45 45L45 315L90 315L90 232.01A244.5 244.5 0 0 0 149.16 268.85L133.78 315L181.22 315L191.86 283.08A244.5 244.5 0 0 0 303.14 283.08L313.78 315L361.22 315L271.22 45L223.78 45L161.56 231.67A205.5 205.5 0 0 1 94.22 181.88L196.88 45L140.62 45L90 112.5ZM204.25 245.9L247.5 116.15L290.75 245.9A205.5 205.5 0 0 1 204.25 245.9Z" fill-rule="evenodd" mask="url(#compass-construction-draw)"/>
+  <path class="f1 lv lv-rd" transform="scale(1.5)" d="M30 30L30 210L60 210L60 30L30 30ZM131.25 30L93.75 30L33 111L57 129L131.25 30ZM149.189 30L89.189 210L120.811 210L180.811 30L149.189 30ZM149.189 30L209.189 210L240.811 210L180.811 30L149.189 30Z"/>
+  <g class="lv lv-rd" mask="url(#compass-construction-sweep)"><path class="f1" transform="scale(1.5)" d="M55.4 112.2L34.6 127.8A163 163 0 0 0 220.749 183.17L211.857 158.738A137 137 0 0 1 55.4 112.2Z"/></g>
+  <g class="g t-aux">
+    <path class="aux rv" style="--i:0" d="M67.5 27L67.5 333" vector-effect="non-scaling-stroke"/>
+    <path class="aux rv" style="--i:1" d="M247.5 27L247.5 333" vector-effect="non-scaling-stroke"/>
+    <path class="aux rv" style="--i:2" d="M27 180L192 180" vector-effect="non-scaling-stroke"/>
+  </g>
+  <g class="g t-sec">
+    <path class="sec rv" style="--i:0" d="M18 45L459 45" vector-effect="non-scaling-stroke"/>
+    <path class="sec rv" style="--i:1" d="M18 315L459 315" vector-effect="non-scaling-stroke"/>
+    <path class="sec rv" style="--i:2" d="M45.27 143.63A225 225 0 0 0 449.73 143.63" vector-effect="non-scaling-stroke"/>
+  </g>
+  <g class="s t-pri">
+    <path class="pri dr rv" style="--i:0" d="M35.76 167.25A244.5 244.5 0 0 0 459.24 167.25" pathLength="1"/>
+    <path class="pri dr rv" style="--i:1" d="M69.53 147.75A205.5 205.5 0 0 0 425.47 147.75" pathLength="1"/>
+    <path class="pri dr rv" style="--i:2" d="M247.5 45L67.5 180" pathLength="1"/>
+    <path class="pri dr rv" style="--i:3" d="M247.5 45L67.5 45" pathLength="1"/>
+    <path class="pri dr rv" style="--i:4" d="M67.5 45L67.5 180" pathLength="1"/>
+    <path class="pri dr rv" style="--i:5" d="M67.5 180L168.75 45" pathLength="1"/>
+    <path class="tick rv" d="M73.5 45L73.5 51L67.5 51"/>
+  </g>
+  <path class="s lv-g lv-arc" d="M45.27 143.63A225 225 0 0 0 449.73 143.63"/>
+  <g class="lv-g lv-turn"><path class="s lv-arm" d="M247.5 45L67.5 180"/></g>
+  <path class="s out dr" d="M90 112.5L90 45L45 45L45 315L90 315L90 232.01A244.5 244.5 0 0 0 149.16 268.85L133.78 315L181.22 315L191.86 283.08A244.5 244.5 0 0 0 303.14 283.08L313.78 315L361.22 315L271.22 45L223.78 45L161.56 231.67A205.5 205.5 0 0 1 94.22 181.88L196.88 45L140.62 45L90 112.5ZM204.25 245.9L247.5 116.15L290.75 245.9A205.5 205.5 0 0 1 204.25 245.9Z" pathLength="1"/>
+  <path class="s lv lv-draw" d="M90 112.5L90 45L45 45L45 315L90 315L90 232.01A244.5 244.5 0 0 0 149.16 268.85L133.78 315L181.22 315L191.86 283.08A244.5 244.5 0 0 0 303.14 283.08L313.78 315L361.22 315L271.22 45L223.78 45L161.56 231.67A205.5 205.5 0 0 1 94.22 181.88L196.88 45L140.62 45L90 112.5ZM204.25 245.9L247.5 116.15L290.75 245.9A205.5 205.5 0 0 1 204.25 245.9Z" mask="url(#compass-construction-draw)"/>
+  <path class="s lv lv-rd" d="M45 45L90 45L90 112.5L140.62 45L196.88 45L90 187.5L90 315L45 315ZM223.78 45L271.22 45L361.22 315L313.78 315L247.5 116.15L181.22 315L133.78 315Z" mask="url(#compass-construction-o-parts)"/>
+  <path class="s lv lv-rd" d="M90 112.5L90 45L45 45L45 315L90 315L90 232.01A244.5 244.5 0 0 0 149.16 268.85L133.78 315L181.22 315L191.86 283.08A244.5 244.5 0 0 0 303.14 283.08L313.78 315L361.22 315L271.22 45L223.78 45L161.56 231.67A205.5 205.5 0 0 1 94.22 181.88L196.88 45L140.62 45L90 112.5ZM204.25 245.9L247.5 116.15L290.75 245.9A205.5 205.5 0 0 1 204.25 245.9Z" mask="url(#compass-construction-o-rest)"/>
+  <circle class="anc fl s rv lv-needle" style="--i:0" cx="247.5" cy="45" r="4.5" vector-effect="non-scaling-stroke"/>
+  <circle class="anc fl s rv" style="--i:1" cx="67.5" cy="180" r="4" vector-effect="non-scaling-stroke"/>
+  <circle class="anc fl s rv" style="--i:2" cx="67.5" cy="45" r="3" vector-effect="non-scaling-stroke"/>
+  <circle class="anc fl s rv" style="--i:3" cx="168.75" cy="45" r="3" vector-effect="non-scaling-stroke"/>
+  <circle class="anc fl s rv" style="--i:4" cx="247.5" cy="116.15" r="3" vector-effect="non-scaling-stroke"/>
+  <circle class="anc fl s rv" style="--i:5" cx="247.5" cy="250.5" r="3" vector-effect="non-scaling-stroke"/>
+  <circle class="anc fl s rv" style="--i:6" cx="247.5" cy="289.5" r="3" vector-effect="non-scaling-stroke"/>
+  <circle class="anc fl s rv" style="--i:7" cx="45" cy="45" r="3" vector-effect="non-scaling-stroke"/>
+  <circle class="anc fl s rv" style="--i:8" cx="45" cy="315" r="3" vector-effect="non-scaling-stroke"/>
+  <circle class="anc fl s rv" style="--i:9" cx="361.22" cy="315" r="3" vector-effect="non-scaling-stroke"/>
+</svg>

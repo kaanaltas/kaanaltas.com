@@ -1,0 +1,204 @@
+---
+// Karpathy-style CV row: logo | role, org, bullets | dates (right, mono).
+import type { Entry } from '../../data/cv';
+import OrgLogo from './OrgLogo.astro';
+import Dates from './Dates.astro';
+import PrizeBadge from './PrizeBadge.astro';
+
+interface Props {
+  entry: Entry;
+  /** Fallback text mark when the entry has no logo. */
+  mark?: string;
+  /** Fallback line icon when the entry has no logo or mark. */
+  icon?: 'school' | 'broadcast' | 'dot';
+  /** Hide the place (e.g. when every row shares it). */
+  hidePlace?: boolean;
+}
+
+const { entry, mark, icon, hidePlace = false } = Astro.props;
+const { id, role, org, logo, start, end, place, note, bullets, tags, highlight } = entry;
+// "expected" qualifies the end date; any other note is a line of its own.
+const dateNote = note === 'expected' ? note : undefined;
+// Advisors can arrive as the note (research) or as a bullet (education);
+// render both the same way so the rows read consistently.
+const isAdvisors = (b: string) => /^advisors?:/i.test(b);
+const lineNote = (note && note !== 'expected' ? note : undefined) ?? bullets?.find(isAdvisors);
+const points = bullets?.filter((b) => b !== lineNote);
+---
+
+<li class:list={['row', { 'row--highlight': !!highlight }]} id={id} data-logo-hover>
+  <OrgLogo logo={logo} mark={mark} icon={icon} />
+  <div class="body">
+    {highlight && <PrizeBadge class="badge" text={highlight} />}
+    <h3 class="role">{role}</h3>
+    <p class="org">
+      {org}
+      {place && !hidePlace && <span class="place">{place}</span>}
+    </p>
+    <Dates class="when" start={start} end={end} note={dateNote} />
+    {
+      (lineNote || points?.length || tags?.length) && (
+        <div class="more">
+          {lineNote && <p class="note">{lineNote}</p>}
+          {points && points.length > 0 && (
+            <ul role="list" class="bullets">
+              {points.map((b) => (
+                <li>{b}</li>
+              ))}
+            </ul>
+          )}
+          {tags && tags.length > 0 && (
+            <p class="tags">
+              <span class="sr-only">Topics: </span>
+              {tags.map((t, i) => (
+                <>
+                  {i > 0 && (
+                    <>
+                      <span class="dot" aria-hidden="true">
+                        ·
+                      </span>
+                      <wbr />
+                    </>
+                  )}
+                  <span class="tag">{t}</span>
+                </>
+              ))}
+            </p>
+          )}
+        </div>
+      )
+    }
+  </div>
+</li>
+
+<style>
+  .body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'badge badge'
+      'role when'
+      'org org'
+      'more more';
+    column-gap: var(--s-5);
+    align-items: baseline;
+    min-width: 0;
+  }
+
+  .body > :global(.badge) {
+    grid-area: badge;
+    justify-self: start;
+    margin-bottom: var(--s-2);
+  }
+
+  .role {
+    grid-area: role;
+    font-size: var(--t-body);
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    color: var(--text);
+    text-wrap: pretty;
+  }
+
+  .body > :global(.when) {
+    grid-area: when;
+    justify-self: end;
+  }
+
+  .org {
+    grid-area: org;
+    margin-top: 1px;
+    font-size: var(--t-sm);
+    line-height: 1.5;
+    color: var(--text-2);
+  }
+
+  .place::before {
+    content: '·';
+    content: '·' / '';
+    margin-inline: 0.5em;
+    color: var(--text-3);
+  }
+
+  .more {
+    grid-area: more;
+    margin-top: var(--s-3);
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .note {
+    font-size: var(--t-sm);
+    line-height: 1.55;
+    color: var(--text-2);
+  }
+
+  .bullets {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--t-sm);
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .bullets li {
+    position: relative;
+    padding-left: 16px;
+    text-wrap: pretty;
+  }
+
+  .bullets li::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: calc(0.8em - 1.5px);
+    width: 5px;
+    height: 1px;
+    background: var(--text-3);
+  }
+
+  .tags {
+    margin-top: 2px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    color: var(--text-2);
+  }
+
+  .tag {
+    white-space: nowrap;
+  }
+
+  .dot {
+    margin-inline: 0.45em;
+    color: var(--text-3);
+  }
+
+  /* Phones: dates move under the org line. */
+  @media (max-width: 559px) {
+    .body {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'badge'
+        'role'
+        'org'
+        'when'
+        'more';
+    }
+    .body > :global(.when) {
+      justify-self: start;
+      margin-top: 2px;
+    }
+  }
+
+  @media print {
+    .role {
+      font-weight: 600;
+    }
+  }
+</style>

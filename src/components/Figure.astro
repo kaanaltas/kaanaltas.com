@@ -1,0 +1,355 @@
+---
+// Inline technical figure. SVGs live in src/figures/<slug>.svg and follow
+// docs/illustration-brief.md. Adds `.is-in` when scrolled into view, which
+// plays the one-shot assembly and starts the figure's ambient loop.
+//
+// Sizing: art is authored so 1 viewBox unit = 1 CSS px. Wide art never scales
+// above that; compact art may grow to 1.35x so it holds its own next to it. Wide (960) figures fill the --wide column; compact (480) ones
+// sit at native size, centred in their frame. With `bleed`, a placed figure
+// runs edge to edge on phones. Art always fits the screen's width: nothing
+// pans sideways, so a finger on a drawing belongs to its live layer.
+const svgs = import.meta.glob<string>('../figures/*.svg', { query: '?raw', import: 'default', eager: true });
+
+interface Props {
+  slug: string;
+  /** Short caption shown under the figure. */
+  caption?: string;
+  /** Figure number shown in the corner, e.g. 1 -> FIG_001. */
+  n?: number;
+  /** Raw SVG markup, overrides the slug lookup (used by the lab page). */
+  raw?: string;
+  size?: 'wide' | 'compact';
+  /** Placed on a page (not the lab): full-bleed on phones. */
+  bleed?: boolean;
+  class?: string;
+}
+
+const { slug, caption, n, raw, size = 'wide', bleed = false, class: className } = Astro.props;
+const svg = raw ?? svgs[`../figures/${slug}.svg`];
+const tag = n != null ? `FIG_${String(n).padStart(3, '0')}` : undefined;
+// Native width from the viewBox, so the art never grows past 1 unit = 1px.
+// Two-state art (unit operations): closed = assembled, open = exploded or cut
+// away. Opted into with data-states on the SVG root; see the contract below.
+const twoState = !!svg && /<svg\b[^>]*\sdata-states=/.test(svg);
+// Art with a story it can tell again (data-replay on the SVG root, played by
+// its live layer, src/scripts/figure-live.ts) gets a Replay button there instead.
+const replay = !twoState && !!svg && /<svg\b[^>]*\sdata-replay[\s=>]/.test(svg);
+const vbWidth = Number(svg?.match(/viewBox="\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)/)?.[1]) || undefined;
+import MicroIcon from './MicroIcon.astro';
+---
+
+<figure
+  class:list={['fig-frame', `fig-frame--${size}`, { 'fig-frame--bleed': bleed, 'fig-frame--states': twoState }, className]}
+  style={vbWidth ? `--fig-native: ${vbWidth}px` : undefined}
+  data-figure
+>
+  {tag && <span class="fig-tag" aria-hidden="true">{tag}</span>}
+  {
+    twoState && (
+      <button class="fig-toggle" type="button" aria-pressed="true" data-fig-toggle>
+        <MicroIcon name="layers" size={16} />
+        <span class="fig-toggle-label">Close</span>
+        <span class="sr-only"> the drawing (assembled view)</span>
+      </button>
+    )
+  }
+  {
+    replay && (
+      <button class="fig-toggle fig-replay" type="button" data-fig-replay>
+        <MicroIcon name="compass" size={16} />
+        <span class="fig-toggle-label">Replay</span>
+        <span class="sr-only"> the drawing</span>
+      </button>
+    )
+  }
+  {
+    svg ? (
+      <div class="fig-art" set:html={svg} />
+    ) : (
+      <div class="fig-art fig-missing" aria-hidden="true">
+        <span class="label">{slug}</span>
+      </div>
+    )
+  }
+  {caption && <figcaption>{caption}</figcaption>}
+  {/* No JS means no .is-in: show the assembled (open) drawing instead of an empty frame. */}
+  <noscript><style is:inline>.fig-frame [data-part],.fig-frame .gd{opacity:1!important;translate:0 0!important}</style></noscript>
+</figure>
+
+<style>
+  .fig-frame {
+    position: relative;
+    margin: 0;
+    padding: var(--s-6) var(--s-4) var(--s-4);
+    border-radius: var(--r-lg);
+    background-color: var(--surface);
+    background-image: radial-gradient(var(--fig-dot) 0.75px, transparent 0.8px);
+    background-size: 6px 6px;
+    box-shadow: var(--shadow-hair);
+  }
+
+  .fig-frame--compact {
+    --fig-upscale: 1.35;
+  }
+
+  .fig-art :global(svg) {
+    display: block;
+    width: 100%;
+    max-width: calc(var(--fig-native, 100%) * var(--fig-upscale, 1));
+    height: auto;
+    margin-inline: auto;
+    overflow: visible;
+  }
+
+  /* A click on a live drawing focuses it (Chrome treats a scripted inline svg
+     as focusable); only keyboard focus may draw a ring. */
+  .fig-art :global(svg:focus:not(:focus-visible)) {
+    outline: none;
+  }
+
+  .fig-tag {
+    position: absolute;
+    top: var(--s-3);
+    font-family: var(--font-pixel);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--fig-ink);
+    opacity: 0.8;
+  }
+
+  .fig-tag {
+    left: var(--s-4);
+  }
+
+  /* A placed drawing keeps the page's vertical scroll and pinch zoom, and
+     gives a sideways finger to its live layer (scrubbing a horizon, a sweep,
+     a slider) instead of losing it to the browser. */
+  .fig-frame--bleed .fig-art :global(svg) {
+    touch-action: pan-y pinch-zoom;
+  }
+
+  /* Closed/open toggle for unit-operation drawings (two-state art). */
+  .fig-toggle {
+    position: absolute;
+    top: 8px;
+    right: var(--s-3);
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    padding: 0 9px 0 7px;
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    letter-spacing: 0.02em;
+    color: var(--text-2);
+    /* The site's clear glass (global.css), at the label alpha: one 1px ring
+       for the edge, a soft shadow, no inset shadows. */
+    background: rgb(var(--glass-tint) / var(--glass-label-alpha));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    box-shadow:
+      0 0 0 1px var(--glass-edge),
+      var(--glass-shadow);
+    transition:
+      color 200ms var(--ease-out),
+      scale var(--dur-quick) var(--spring-quick);
+  }
+
+  .fig-toggle:active {
+    scale: 0.96;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .fig-toggle:hover {
+      color: var(--text);
+    }
+  }
+
+  figcaption {
+    margin-top: var(--s-4);
+    padding-inline: var(--s-1);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: 1.5;
+    color: var(--text-2);
+    text-wrap: pretty;
+  }
+
+  .fig-missing {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 9;
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--r-md);
+  }
+
+  /* Phones: placed figures run edge to edge, so the art gets every pixel. */
+  @media (max-width: 639.98px) {
+    .fig-frame--bleed {
+      margin-inline: calc(-1 * var(--gutter));
+      padding-inline: var(--s-3);
+      border-radius: 0;
+    }
+
+    .fig-frame--bleed .fig-tag {
+      left: var(--s-3);
+    }
+
+    .fig-frame--bleed figcaption {
+      padding-inline: var(--s-1);
+    }
+  }
+</style>
+
+<script>
+  import { initFigureLive } from '../scripts/figure-live';
+
+  initFigureLive();
+
+  // One observer for every figure on the page.
+  const figs = document.querySelectorAll<HTMLElement>('[data-figure]');
+  if (!('IntersectionObserver' in window)) {
+    figs.forEach((f) => f.classList.add('is-in'));
+  } else {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) e.target.classList.add('is-in');
+          // Pause ambient loops while off-screen.
+          (e.target as HTMLElement).classList.toggle('is-paused', !e.isIntersecting);
+        }
+      },
+      { threshold: 0.35 },
+    );
+    figs.forEach((f) => io.observe(f));
+  }
+
+  // Two-state art: unit drawings start closed (assembled) and open up the
+  // first time they scroll into view; the toggle switches between the two.
+  // Without JS (or IntersectionObserver) they stay open, the informative view.
+  const stateFigs = document.querySelectorAll<HTMLElement>('.fig-frame--states');
+  const setOpen = (frame: HTMLElement, open: boolean) => {
+    frame.classList.toggle('is-closed', !open);
+    const btn = frame.querySelector<HTMLButtonElement>('[data-fig-toggle]');
+    if (!btn) return;
+    btn.setAttribute('aria-pressed', String(open));
+    const label = btn.querySelector('.fig-toggle-label');
+    if (label) label.textContent = open ? 'Close' : 'Open';
+    const sr = btn.querySelector('.sr-only');
+    if (sr) sr.textContent = open ? ' the drawing (assembled view)' : ' the drawing (exploded view)';
+  };
+  // Replay: the live layer listens for 'fig-replay' on its SVG.
+  document.querySelectorAll<HTMLButtonElement>('[data-fig-replay]').forEach((btn) =>
+    btn.addEventListener('click', () =>
+      btn.closest('[data-figure]')?.querySelector('svg[data-fig]')?.dispatchEvent(new CustomEvent('fig-replay')),
+    ),
+  );
+  stateFigs.forEach((frame) => {
+    frame.querySelector('[data-fig-toggle]')?.addEventListener('click', () =>
+      setOpen(frame, frame.classList.contains('is-closed')),
+    );
+  });
+  if ('IntersectionObserver' in window && stateFigs.length) {
+    stateFigs.forEach((f) => setOpen(f, false));
+    const opener = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          const frame = e.target as HTMLElement;
+          opener.unobserve(frame);
+          // Let the closed form finish assembling (≈1.4 s) and rest a beat first.
+          window.setTimeout(() => setOpen(frame, true), 1900);
+        }
+      },
+      { threshold: 0.45 },
+    );
+    stateFigs.forEach((f) => opener.observe(f));
+  }
+</script>
+
+<style is:global>
+  /* Two-state contract (docs/illustration-brief.md, rule 15).
+     [data-move]: a plain <g> (no transform attribute) that sits at its OPEN
+       position and slides to --cx/--cy (user units) when closed.
+     [data-open-only] / [data-closed-only]: shown in one state only, e.g. the
+       cut-away interior vs the intact outer shell.
+     Choreography (all optional, per element, NOT inherited, so a value on a
+     wrapper never leaks into the parts inside it):
+       --d-open / --d-close  delay of this element's transition when the figure
+                             opens / closes (so closing can run its own order,
+                             not just the opening played backwards)
+       --t-move / --ease-move  duration and easing of a [data-move] slide
+                             (default 720ms --spring-snappy)
+       --t-fade              duration of an open-only / closed-only fade
+                             (default 260ms; 0s for a hard swap under cover)
+     --m keeps working: calc(--m × 70ms) is added to the move delay. */
+  @property --d-open {
+    syntax: '<time>';
+    inherits: false;
+    initial-value: 0s;
+  }
+  @property --d-close {
+    syntax: '<time>';
+    inherits: false;
+    initial-value: 0s;
+  }
+  @property --t-move {
+    syntax: '<time>';
+    inherits: false;
+    initial-value: 720ms;
+  }
+  @property --t-fade {
+    syntax: '<time>';
+    inherits: false;
+    initial-value: 260ms;
+  }
+  @property --ease-move {
+    syntax: '*';
+    inherits: false;
+  }
+  .fig-frame [data-move] {
+    transform: translate(0px, 0px);
+    transition: transform var(--t-move, 720ms) var(--ease-move, var(--spring-snappy));
+    transition-delay: calc(var(--m, 0) * 70ms + var(--d-open, 0s));
+  }
+  .fig-frame.is-closed [data-move] {
+    transform: translate(var(--cx, 0px), var(--cy, 0px));
+    transition-delay: calc(var(--m, 0) * 70ms + var(--d-close, 0s));
+  }
+  .fig-frame [data-open-only],
+  .fig-frame [data-closed-only] {
+    transition: opacity var(--t-fade, 260ms) var(--ease-out) var(--d-open, 0s);
+  }
+  .fig-frame.is-closed [data-open-only],
+  .fig-frame.is-closed [data-closed-only] {
+    transition-delay: var(--d-close, 0s);
+  }
+  .fig-frame [data-closed-only],
+  .fig-frame.is-closed [data-open-only] {
+    opacity: 0;
+  }
+  .fig-frame.is-closed [data-closed-only] {
+    opacity: 1;
+  }
+  /* electrolyzer-stack: the clamp, set here because its SVG is owned by its generator
+     (fold into experiments/figures-opus/tools/electrolyzer-stack.mjs when it is next
+     regenerated). Plates and tie rods share one overshoot-free spring, so no plate
+     ever passes its seat; the flow fields hide only once the gaps have shut. */
+  .fig-frame [data-fig='electrolyzer-stack'] [data-move] {
+    --t-move: 820ms;
+    --ease-move: var(--spring-soft);
+  }
+  .fig-frame [data-fig='electrolyzer-stack'] .z {
+    transition: scale 820ms var(--spring-soft);
+  }
+  .fig-frame.is-closed [data-fig='electrolyzer-stack'] [data-open-only]:not(.q) {
+    transition-delay: 600ms;
+  }
+
+  .fig-frame.is-paused svg *,
+  .fig-frame.is-paused svg {
+    animation-play-state: paused !important;
+  }
+</style>

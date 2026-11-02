@@ -1,0 +1,327 @@
+---
+import BrandCompass from './BrandCompass.astro';
+import { nav } from '../data/site';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
+---
+
+<header class="site-header">
+  <div class="bar">
+    <BrandCompass />
+    <nav class="tabs" aria-label="Primary" data-tabs>
+      <span class="glass" aria-hidden="true"></span>
+      {
+        nav.map((item) => (
+          <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+    <button class="nav-search" type="button" data-palette-open aria-haspopup="dialog" aria-label="Search site">
+      <svg class="nav-search-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <circle cx="11" cy="11" r="6.25"></circle>
+        <path d="m15.75 15.75 3.5 3.5"></path>
+      </svg>
+    </button>
+    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle dark mode">
+      <svg class="theme-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <g class="sun">
+          <circle cx="12" cy="12" r="4"></circle>
+          <g class="rays">
+            <path d="M12 2.75v1.5"></path>
+            <path d="M18.54 5.46l-1.06 1.06"></path>
+            <path d="M21.25 12h-1.5"></path>
+            <path d="M18.54 18.54l-1.06-1.06"></path>
+            <path d="M12 21.25v-1.5"></path>
+            <path d="M5.46 18.54l1.06-1.06"></path>
+            <path d="M2.75 12h1.5"></path>
+            <path d="M5.46 5.46l1.06 1.06"></path>
+          </g>
+        </g>
+        <path class="moon" d="M20.25 14.07A8.25 8.25 0 0 1 9.93 3.75a8.25 8.25 0 1 0 10.32 10.32Z"></path>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    /* Held still through page transitions: Base.astro names it site-header
+       while one runs, and only then (a named header is a Backdrop Root, and
+       the nav's glass would stop seeing the page). */
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: var(--s-3) var(--gutter);
+    /* A thin fade, so the page reaches the glass (global.css). */
+    background: var(--glass-scrim);
+  }
+
+  .bar {
+    max-width: var(--wide);
+    margin-inline: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+  }
+
+  .tabs {
+    position: relative;
+    display: flex;
+    gap: 2px;
+    margin-left: auto;
+    perspective: 1400px;
+    isolation: isolate;
+    /* A finger may slide along the tabs (src/scripts/scrub.ts); the page
+       still scrolls under a vertical one. */
+    touch-action: pan-y;
+  }
+
+  .tabs a {
+    position: relative;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    padding: 6px 12px;
+    font-size: var(--t-sm);
+    line-height: 20px;
+    color: var(--text-2);
+    text-decoration: none;
+    border-radius: 12px;
+    transition: color 200ms var(--ease-out);
+  }
+
+  .tabs a[aria-current='page'] {
+    color: var(--text);
+  }
+
+  @media (hover: hover) {
+    .tabs a:hover {
+      color: var(--text);
+    }
+  }
+
+  /* The glass pill (global.css), moved by src/scripts/tabs.ts. Clear: the
+     page shows through, blurred a little; the label sits on a denser ellipse
+     of the same tint. One 1px edge and no inset shadows, so nothing inside
+     it can sit off centre. */
+  .glass {
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    height: var(--h, 32px);
+    width: var(--w, 0);
+    translate: var(--x, 0) var(--y, 0);
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transform-origin: var(--ox, 50%) var(--oy, 50%);
+    border-radius: 12px;
+    pointer-events: none;
+    opacity: var(--o, 0);
+    background: radial-gradient(
+      62% 80% at 50% 50%,
+      rgb(var(--glass-tint) / var(--glass-text-alpha)),
+      rgb(var(--glass-tint) / var(--glass-alpha))
+    );
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    border: 1px solid var(--glass-edge);
+    box-shadow: var(--glass-shadow);
+    transition:
+      translate var(--dur-snappy) var(--spring-snappy),
+      width var(--dur-snappy) var(--spring-snappy),
+      transform 450ms var(--spring-quick),
+      opacity 300ms var(--ease-out);
+  }
+
+  .glass.no-anim {
+    transition: none;
+  }
+
+  /* Search: stands in for the floating "Jump to…" pill where that pill is
+     hidden (touch, or narrow screens), so it sits in the header instead of
+     over the text. Opens the command palette via [data-palette-open]. */
+  .nav-search {
+    display: none;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    margin-right: calc(var(--s-3) * -1 + 2px);
+    border-radius: 10px;
+    color: var(--text-2);
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      color 200ms var(--ease-out),
+      scale var(--dur-quick) var(--spring-quick);
+  }
+
+  @media (max-width: 639px), (hover: none), (pointer: coarse) {
+    .nav-search {
+      display: grid;
+    }
+  }
+
+  .nav-search:active {
+    scale: 0.92;
+  }
+
+  @media (hover: hover) {
+    .nav-search:hover {
+      color: var(--text);
+    }
+  }
+
+  .nav-search-icon {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+
+  .theme-toggle {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    color: var(--text-2);
+    transition:
+      color 200ms var(--ease-out),
+      scale var(--dur-quick) var(--spring-quick);
+  }
+
+  .theme-toggle:active {
+    scale: 0.92;
+  }
+
+  @media (hover: hover) {
+    .theme-toggle:hover {
+      color: var(--text);
+    }
+  }
+
+  .theme-icon {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    overflow: visible;
+  }
+
+  .sun,
+  .moon,
+  .rays path {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition:
+      opacity 200ms var(--ease-out),
+      scale var(--dur-bounce) var(--spring-bounce),
+      rotate var(--dur-snappy) var(--spring-snappy);
+  }
+
+  .rays path:nth-child(2) { transition-delay: 20ms; }
+  .rays path:nth-child(3) { transition-delay: 40ms; }
+  .rays path:nth-child(4) { transition-delay: 60ms; }
+  .rays path:nth-child(5) { transition-delay: 80ms; }
+  .rays path:nth-child(6) { transition-delay: 100ms; }
+  .rays path:nth-child(7) { transition-delay: 120ms; }
+  .rays path:nth-child(8) { transition-delay: 140ms; }
+
+  /* Light: show the moon (the action), dark: show the sun */
+  :global([data-theme='light']) .sun {
+    opacity: 0;
+    scale: 0.5;
+    rotate: -90deg;
+  }
+  :global([data-theme='light']) .rays path {
+    scale: 0;
+  }
+  :global([data-theme='dark']) .moon {
+    opacity: 0;
+    scale: 0.5;
+    rotate: 30deg;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    :global([data-theme='light']) .theme-toggle:hover .moon {
+      rotate: -20deg;
+    }
+    :global([data-theme='dark']) .theme-toggle:hover .sun {
+      rotate: 45deg;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .tabs a {
+      padding: 6px 9px;
+    }
+  }
+
+  /* Phones: the bar sits right over the text it scrolls past, so the page
+     going under it gets a scroll-edge effect: a stronger fade and a blur
+     that thins out below the bar (masked), instead of a hard edge. The
+     blur is a layer of its own, so the tabs' glass still sees the page. */
+  @media (max-width: 639.98px) {
+    .site-header {
+      background: linear-gradient(
+        color-mix(in srgb, var(--bg) 94%, transparent),
+        color-mix(in srgb, var(--bg) 72%, transparent) 62%,
+        color-mix(in srgb, var(--bg) 0%, transparent)
+      );
+    }
+    .site-header::before {
+      content: '';
+      position: absolute;
+      /* Past the screen's sides, so the blur has no edge to show. */
+      inset: -12px -24px -18px;
+      z-index: -1;
+      pointer-events: none;
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      -webkit-mask-image: linear-gradient(#000 45%, transparent);
+      mask-image: linear-gradient(#000 45%, transparent);
+    }
+  }
+
+  /* Four tabs on the narrowest phones (320–379px): tighter gaps, 13px tabs
+     and slimmer icon buttons, so nothing in the bar ever shrinks. */
+  @media (max-width: 379.98px) {
+    .site-header {
+      padding-inline: 12px;
+    }
+    .bar {
+      gap: 6px;
+    }
+    .tabs {
+      gap: 0;
+    }
+    .tabs a {
+      padding: 6px 6px;
+      font-size: 13px;
+    }
+    .nav-search,
+    .theme-toggle {
+      width: 30px;
+    }
+    .nav-search {
+      margin-right: -6px;
+    }
+  }
+
+  .nav-search,
+  .theme-toggle {
+    flex-shrink: 0;
+  }
+</style>
+
+<script>
+  import { initTabs } from '../scripts/tabs';
+  import { toggleTheme } from '../scripts/theme';
+
+  initTabs();
+  document.querySelector('[data-theme-toggle]')?.addEventListener('click', toggleTheme);
+</script>

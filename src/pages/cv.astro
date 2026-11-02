@@ -1,0 +1,807 @@
+---
+import Base from '../layouts/Base.astro';
+import BrandIcon from '../components/BrandIcon.astro';
+import DownloadCV from '../components/DownloadCV.astro';
+import Section from '../components/cv/Section.astro';
+import Timeline from '../components/cv/Timeline.astro';
+import Entry from '../components/cv/Entry.astro';
+import Publication from '../components/cv/Publication.astro';
+import SkillChips from '../components/cv/SkillChips.astro';
+import Dates from '../components/cv/Dates.astro';
+import OrgLogo from '../components/cv/OrgLogo.astro';
+import PrizeBadge from '../components/cv/PrizeBadge.astro';
+import {
+  person,
+  socials,
+  education,
+  researchInterests,
+  research,
+  experience,
+  publications,
+  talks,
+  teaching,
+  activities,
+  honors,
+  skills,
+  certificates,
+  certificateLink,
+} from '../data/cv';
+
+const description = `Curriculum vitae of ${person.name}: education, research, experience, publications and skills.`;
+import MicroIcon from '../components/MicroIcon.astro';
+---
+
+<Base title="CV" description={description}>
+  <article class="cv container">
+    <header class="cv-head enter">
+      <p class="label">Curriculum vitae</p>
+      <h1>{person.name}</h1>
+      <p class="lede">{person.tagline}</p>
+      <ul role="list" class="contact">
+        <li class="contact__plain">
+          <svg class="ico" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+            <path d="M12 20.25s-6.25-5.2-6.25-10.25a6.25 6.25 0 1 1 12.5 0c0 5.05-6.25 10.25-6.25 10.25Z"></path>
+            <circle cx="12" cy="10" r="2.25"></circle>
+          </svg>
+          {person.location}
+        </li>
+        <li>
+          <a class="contact__link" href={`mailto:${person.email}`}>
+            <MicroIcon name="mail" class="ico" />
+            <span>{person.email}</span>
+          </a>
+        </li>
+        {
+          socials.map((s) => (
+            <li>
+              <a class="contact__link contact__link--brand" href={s.href} target="_blank" rel="me noopener">
+                <BrandIcon name={s.icon} size={15} class="bico icon icon--pop" />
+                <span>{s.label}</span>
+                <span class="sr-only">(opens in a new tab)</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="actions">
+        <DownloadCV />
+        <button type="button" class="copy-btn pressable" data-copy-email={person.email}>
+          <MicroIcon name="copy" class="ico" />
+          <span class="copy-btn__label" data-copy-label>Copy email</span>
+        </button>
+        <span class="sr-only" role="status" aria-live="polite" data-copy-status></span>
+      </div>
+    </header>
+
+    <div class="sections">
+      <Section id="education" title="Education">
+        <Timeline>
+          {education.map((e) => <Entry entry={e} icon="school" />)}
+        </Timeline>
+      </Section>
+
+      <Section id="research" title="Research experience">
+        <div class="interests">
+          <h3 class="label" id="interests-title">Interests</h3>
+          <ul role="list" class="interests__list" aria-labelledby="interests-title">
+            {researchInterests.map((r) => <li>{r}</li>)}
+          </ul>
+        </div>
+        <Timeline>
+          {research.map((e) => <Entry entry={e} />)}
+        </Timeline>
+      </Section>
+
+      <Section id="experience" title="Experience">
+        <Timeline>
+          {experience.map((e) => <Entry entry={e} />)}
+        </Timeline>
+      </Section>
+
+      <Section id="publications" title="Publications">
+        <Timeline>
+          {publications.map((p, i) => <Publication item={p} index={i + 1} />)}
+        </Timeline>
+      </Section>
+
+      <Section id="talks" title="Talks">
+        <Timeline>
+          {talks.map((t) => <Publication item={t} />)}
+        </Timeline>
+      </Section>
+
+      <Section id="teaching" title="Teaching & service">
+        <Timeline>
+          {teaching.map((e) => <Entry entry={e} />)}
+        </Timeline>
+      </Section>
+
+      <Section id="activities" title="Activities">
+        <Timeline>
+          {
+            activities.map((e) => (
+              <Entry entry={e} icon="broadcast" />
+            ))
+          }
+        </Timeline>
+      </Section>
+
+      <Section id="honors" title="Honors & awards">
+        <Timeline>
+          {
+            honors.map((h) => (
+              <li class="row honor" id={`honor-${h.id}`} data-logo-hover>
+                <OrgLogo logo={h.logo} icon="dot" />
+                <div class="honor__body">
+                  {h.badge && <PrizeBadge class="honor__badge" text={h.badge} />}
+                  <h3 class="honor__title">{h.title}</h3>
+                  {h.when && <span class="honor__when">{h.when}</span>}
+                  {h.detail && <p class="honor__detail">{h.detail}</p>}
+                  {
+                    h.href && (
+                      <p class="honor__link">
+                        <a class="link" href={h.href} target="_blank" rel="noopener">
+                          <MicroIcon name="globe" class="honor__globe" />
+                          {new URL(h.href).hostname.replace(/^www\./, '')}
+                          <MicroIcon name="arrow-up-right" />
+                          <span class="sr-only">(opens in a new tab)</span>
+                        </a>
+                      </p>
+                    )
+                  }
+                </div>
+              </li>
+            ))
+          }
+        </Timeline>
+      </Section>
+
+      <Section id="skills" title="Skills">
+        <dl class="kv">
+          <div class="kv__row">
+            <dt class="label">Programming</dt>
+            <dd><SkillChips items={skills.programming} label="Programming languages" /></dd>
+          </div>
+          <div class="kv__row">
+            <dt class="label">Tools</dt>
+            <dd><SkillChips items={skills.tools} label="Tools" /></dd>
+          </div>
+        </dl>
+      </Section>
+
+      <Section id="languages" title="Languages">
+        <dl class="kv kv--text">
+          {
+            skills.languages.map((l) => (
+              <div class="kv__row">
+                <dt>{l.name}</dt>
+                <dd>{l.level}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </Section>
+
+      <Section id="certificates" title="Certificates">
+        <Timeline class="certs">
+          {
+            certificates.map((c) => {
+              const link = certificateLink(c);
+              return (
+                <li class="row cert" id={`cert-${c.id}`} data-logo-hover>
+                  <OrgLogo logo={c.logo} />
+                  <div class="cert__body">
+                    <h3 class="cert__title">{c.title}</h3>
+                    <p class="cert__meta">
+                      {c.issuer}
+                      <span class="cert__sep" aria-hidden="true">·</span>
+                      {c.platform}
+                      {/* The date may wrap to its own line on narrow phones. */}
+                      <wbr />
+                      <span class="cert__sep" aria-hidden="true">·</span>
+                      <Dates start={c.issued} />
+                    </p>
+                    {link ? (
+                      <a class="cert__link" href={link} target="_blank" rel="noopener">
+                        View certificate
+                        <MicroIcon name="arrow-up-right" class="cert__arrow" />
+                        <span class="sr-only">(opens in a new tab)</span>
+                      </a>
+                    ) : (
+                      <span class="cert__link is-soon" aria-disabled="true">
+                        View certificate
+                        <svg class="cert__arrow" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                          <path d="M8.75 15.25 15.25 8.75M9.75 8.75h5.5v5.5" />
+                        </svg>
+                        <span class="cert__soon">
+                          <span class="sr-only">(link </span>soon<span class="sr-only">)</span>
+                        </span>
+                      </span>
+                    )}
+                  </div>
+                </li>
+              );
+            })
+          }
+        </Timeline>
+      </Section>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .cv {
+    --measure: 700px;
+    padding-block: var(--s-7) var(--s-8);
+  }
+
+  @media (min-width: 640px) {
+    .cv {
+      padding-block: var(--s-9) var(--s-9);
+    }
+  }
+
+  /* Header */
+  .cv-head {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cv-head h1 {
+    margin-top: var(--s-3);
+    font-size: var(--t-h1);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .lede {
+    margin-top: var(--s-3);
+    max-width: 34em;
+    font-size: var(--t-body);
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-4);
+    margin: var(--s-5) 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--t-sm);
+    line-height: 20px;
+    color: var(--text-2);
+  }
+
+  .contact li {
+    display: flex;
+  }
+
+  .contact__plain,
+  .contact__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .contact__link {
+    color: var(--text-2);
+    text-decoration: none;
+    transition: color 200ms var(--ease-out);
+  }
+
+  .contact__link span {
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 200ms var(--ease-out);
+  }
+
+  .ico {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    color: var(--text-3);
+    overflow: visible;
+  }
+
+  .contact :global(.bico) {
+    color: var(--text-3);
+    transition:
+      color 240ms var(--ease-out),
+      translate var(--dur-bounce) var(--spring-bounce),
+      scale var(--dur-bounce) var(--spring-bounce);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .contact__link:hover {
+      color: var(--text);
+    }
+    .contact__link:hover span {
+      text-decoration-color: var(--ul-hover);
+    }
+    .contact__link:hover .ico {
+      color: var(--text);
+    }
+    .contact__link--brand:hover :global(.bico) {
+      color: var(--brand);
+    }
+  }
+
+  /* X and GitHub are black: use the text color so they show in dark mode. */
+  /* Touch: a press lights the link as hover does (touch-hot.ts). */
+  .contact__link:global(.is-hot),
+  .contact__link:global(.is-hot) .ico {
+    color: var(--text);
+  }
+  .contact__link--brand:global(.is-hot) :global(.bico) {
+    color: var(--brand);
+  }
+  .contact__link--brand:global(.is-hot) :global(.bico[style*='#000000']),
+  .contact__link--brand:global(.is-hot) :global(.bico[style*='#181717']) {
+    color: var(--text);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .contact__link--brand:hover :global(.bico[style*='#000000']),
+    .contact__link--brand:hover :global(.bico[style*='#181717']) {
+      color: var(--text);
+    }
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    margin-top: var(--s-6);
+  }
+
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    height: 36px;
+    padding: 0 var(--s-3) 0 10px;
+    border-radius: 10px;
+    font-size: var(--t-sm);
+    font-weight: 450;
+    color: var(--text-2);
+    transition:
+      scale var(--dur-quick) var(--spring-quick),
+      color 200ms var(--ease-out),
+      background-color 200ms var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .copy-btn:hover {
+      color: var(--text);
+      background: var(--surface-2);
+    }
+    .copy-btn:hover .ico {
+      color: var(--text);
+    }
+  }
+
+  .copy-btn:focus-visible {
+    border-radius: 10px;
+  }
+
+  /* Done: the tick is green, like the Download CV confirmation. */
+  .copy-btn.is-done {
+    color: var(--text);
+  }
+
+  .copy-btn :global(.m-check) {
+    color: #15803d;
+  }
+
+  :global([data-theme='dark']) .copy-btn :global(.m-check) {
+    color: #4ade80;
+  }
+
+  .sections {
+    margin-top: var(--s-8);
+  }
+
+  @media (min-width: 640px) {
+    .sections {
+      margin-top: 80px;
+    }
+  }
+
+  /* Research interests line */
+  .interests {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px var(--s-3);
+    margin: var(--s-2) 0 var(--s-2);
+    padding: var(--s-3) 14px;
+    border-radius: var(--r-md);
+    background: var(--surface-2);
+    font-size: var(--t-sm);
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .interests .label {
+    font-size: 11px;
+    line-height: inherit;
+  }
+
+  .interests__list {
+    flex: 1 1 20em;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--text);
+  }
+
+  .interests__list li {
+    white-space: nowrap;
+  }
+
+  .interests__list li:not(:last-child)::after {
+    content: '·';
+    content: '·' / '';
+    margin-inline: 0.45em;
+    color: var(--text-3);
+  }
+
+  /* Honors */
+  .honor__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'badge badge'
+      'title when'
+      'detail detail'
+      'link link';
+    column-gap: var(--s-5);
+    align-items: baseline;
+  }
+
+  .honor__title {
+    grid-area: title;
+    font-size: var(--t-body);
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    text-wrap: pretty;
+  }
+
+  .honor__when {
+    grid-area: when;
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: 1.4;
+    color: var(--text-2);
+    text-align: right;
+  }
+
+  .honor__detail {
+    grid-area: detail;
+    margin-top: 4px;
+    font-size: var(--t-sm);
+    line-height: 1.55;
+    color: var(--text-2);
+  }
+
+  .honor__body > :global(.honor__badge) {
+    grid-area: badge;
+    justify-self: start;
+    margin-bottom: var(--s-2);
+  }
+
+  /* Same mono line as a publication's DOI (Publication.astro). */
+  .honor__link {
+    grid-area: link;
+    margin-top: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--t-label);
+    line-height: 1.5;
+  }
+
+  .honor__link .link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 400;
+    overflow-wrap: anywhere;
+  }
+
+  .honor__link .link :global(.micro) {
+    color: var(--text-3);
+  }
+
+  @media (max-width: 559px) {
+    .honor__body {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'badge'
+        'title'
+        'detail'
+        'link'
+        'when';
+    }
+    .honor__when {
+      margin-top: 6px;
+      text-align: left;
+    }
+  }
+
+  /* Skills + languages */
+  .kv {
+    display: grid;
+    margin: var(--s-3) 0 0;
+  }
+
+  .kv__row {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: var(--s-2) var(--s-4);
+    align-items: baseline;
+    padding-block: 14px;
+    border-top: 1px solid var(--line);
+  }
+
+  .kv__row:first-child {
+    border-top: 0;
+    padding-top: var(--s-2);
+  }
+
+  .kv dt.label {
+    line-height: 26px;
+  }
+
+  .kv dd {
+    margin: 0;
+  }
+
+  .kv--text dt {
+    font-weight: 450;
+    color: var(--text);
+  }
+
+  .kv--text dd {
+    font-size: var(--t-sm);
+    color: var(--text-2);
+  }
+
+  @media (max-width: 479px) {
+    .kv:not(.kv--text) .kv__row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .kv--text .kv__row {
+      grid-template-columns: 96px minmax(0, 1fr);
+    }
+  }
+
+  /* Software: the app's own icon, then name and status like a certificate row. */
+
+
+
+
+
+
+
+  /* Certificates */
+  .cert__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'title link'
+      'meta meta';
+    column-gap: var(--s-5);
+    align-items: baseline;
+  }
+
+  .cert__title {
+    grid-area: title;
+    font-size: var(--t-body);
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    text-wrap: pretty;
+  }
+
+  .cert__meta {
+    grid-area: meta;
+    margin-top: 1px;
+    font-size: var(--t-sm);
+    line-height: 1.5;
+    color: var(--text-2);
+  }
+
+  .cert__sep {
+    margin-inline: 0.45em;
+    color: var(--text-3);
+  }
+
+  .cert__link {
+    grid-area: link;
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: var(--t-sm);
+    line-height: 1.5;
+    font-weight: 450;
+    color: var(--text);
+    white-space: nowrap;
+    text-decoration-line: underline;
+    text-decoration-color: var(--ul-rest);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition:
+      color 200ms var(--ease-out),
+      text-decoration-color 200ms var(--ease-out);
+  }
+
+  .cert__arrow {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    color: var(--text-3);
+    overflow: visible;
+  }
+
+  /* No URL yet: present but clearly inert (not a link, no pointer). */
+  .cert__link.is-soon {
+    color: var(--text-3);
+    text-decoration: none;
+    cursor: default;
+    user-select: none;
+  }
+
+  .cert__soon {
+    margin-left: 4px;
+    padding: 2px 5px;
+    border-radius: 4px;
+    background: var(--surface-2);
+    color: var(--text-2);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    a.cert__link:hover {
+      text-decoration-color: var(--ul-hover);
+    }
+    a.cert__link:hover .cert__arrow {
+      color: var(--text);
+    }
+  }
+
+  @media (max-width: 559px) {
+    .cert__body {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'title'
+        'meta'
+        'link';
+    }
+    .cert__link {
+      justify-self: start;
+      margin-top: 6px;
+    }
+  }
+
+  @media print {
+    .cert__link.is-soon {
+      display: none;
+    }
+  }
+</style>
+
+<style is:global>
+  @media print {
+    @page {
+      margin: 14mm 14mm 16mm;
+    }
+    html:root,
+    html:root[data-theme] {
+      --bg: #fff;
+      --surface: #fff;
+      --surface-2: #f3f3f3;
+      --text: #000;
+      --text-2: #333;
+      --text-3: #777;
+      --line: #d6d6d6;
+      --line-strong: #bbb;
+      --ul-rest: #bbb;
+      --accent: #1342ff;
+      --accent-soft: #fff;
+      --shadow-hair: none;
+      color-scheme: light;
+      background: #fff;
+    }
+    html {
+      font-size: 10.5pt;
+    }
+    body > :not(main) {
+      display: none !important;
+    }
+    .cv {
+      max-width: none !important;
+      padding: 0 !important;
+    }
+    .enter > * {
+      animation: none !important;
+    }
+    .cv .actions,
+    .cv .cv-head > .label {
+      display: none !important;
+    }
+    .cv .highlights {
+      margin-top: 14pt !important;
+    }
+    .cv .sections {
+      margin-top: 18pt !important;
+    }
+    .cv .interests {
+      background: none;
+      padding: 0;
+    }
+    .cv a {
+      color: #000 !important;
+    }
+  }
+</style>
+
+<script>
+  // Copy email: the label flips to "Copied" and the copy glyph draws its
+  // check (micro.css, .is-done), then both return.
+  const btn = document.querySelector<HTMLButtonElement>('[data-copy-email]');
+  const label = btn?.querySelector('[data-copy-label]');
+  const status = document.querySelector('[data-copy-status]');
+  let timer = 0;
+  btn?.addEventListener('click', async () => {
+    const email = btn.dataset.copyEmail ?? '';
+    let ok = true;
+    try {
+      await navigator.clipboard.writeText(email);
+    } catch {
+      // Older or locked-down browsers: the hidden-textarea copy.
+      const ta = document.createElement('textarea');
+      ta.value = email;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+      document.body.append(ta);
+      ta.select();
+      try {
+        ok = document.execCommand('copy');
+      } catch {
+        ok = false;
+      }
+      ta.remove();
+    }
+    if (!ok) {
+      // Nothing could be copied: show the address itself instead.
+      if (label) label.textContent = email;
+      return;
+    }
+    btn.classList.remove('is-done');
+    void btn.offsetWidth;
+    btn.classList.add('is-done');
+    if (label) label.textContent = 'Copied';
+    if (status) status.textContent = `Copied ${email} to the clipboard`;
+    clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      btn.classList.remove('is-done');
+      if (label) label.textContent = 'Copy email';
+    }, 1800);
+  });
+</script>

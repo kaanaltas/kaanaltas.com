@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 488" fill="none" class="fig" data-fig="mpc-horizon" role="img" aria-labelledby="mpc-horizon-title mpc-horizon-desc">
+<title id="mpc-horizon-title">Model predictive control: the receding horizon</title>
+<desc id="mpc-horizon-desc">Two stacked time plots split by a vertical line at the current sample k. Upper plot: the measured output y of the first-order plant y[t+1] = 0.8 y[t] + 0.2 u[t], steady at 0.2 until the set-point steps to 1 at k-3, then rising; to the right of k, the dashed reference r = 1 and the predicted output y-hat(k+i|k) over a prediction horizon of Np = 10 samples, which is the model rolled out on the planned inputs. Lower plot: past inputs as zero-order-hold bars, then the plan from the quadratic cost sum (y-hat - r)^2 + 8 sum du^2 with control horizon Nc = 4: four shrinking upward moves, held constant afterwards. Only the first move, u(k), is applied; at the next sample the window shifts one step and the problem is solved again.</desc>
+<style>[data-fig="mpc-horizon"] .s{stroke:var(--fig-ink,#1342ff)}
+[data-fig="mpc-horizon"] .i{fill:var(--fig-ink,#1342ff)}
+[data-fig="mpc-horizon"] .fl{fill:var(--fig-lit,#ffffff)}
+[data-fig="mpc-horizon"] .f0{fill:var(--fig-50,#f4f5f9)}
+[data-fig="mpc-horizon"] .f1{fill:var(--fig-100,#e6ebff)}
+[data-fig="mpc-horizon"] .f2{fill:var(--fig-200,#b9c7fd)}
+[data-fig="mpc-horizon"] .f3{fill:var(--fig-300,#97acff)}
+[data-fig="mpc-horizon"] .g{stroke:var(--fig-400,#607ffd)}
+[data-fig="mpc-horizon"] path{stroke-linecap:butt;stroke-linejoin:miter}
+[data-fig="mpc-horizon"] text{font-family:'Departure Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.02em}
+[data-fig="mpc-horizon"] .mpc-horizon-ghost{opacity:0}
+:where(.fig-frame) [data-fig="mpc-horizon"] [data-part]{opacity:0;translate:0 calc(var(--lift,-40)*1px);transition:translate 820ms var(--spring-soft,cubic-bezier(.23,1,.32,1)) calc(var(--i)*110ms),opacity 400ms ease calc(var(--i)*110ms)}
+.is-in [data-fig="mpc-horizon"] [data-part],[data-fig="mpc-horizon"].is-in [data-part]{opacity:1;translate:0 0}
+.is-in [data-fig="mpc-horizon"] .mpc-horizon-ghost,[data-fig="mpc-horizon"].is-in .mpc-horizon-ghost{animation:mpc-horizon-recede 3.2s cubic-bezier(.65,0,.35,1) 1.4s infinite}
+@keyframes mpc-horizon-recede{0%{translate:0 0;opacity:0}12%{translate:0 0;opacity:1}58%{translate:40px 0;opacity:1}80%{translate:40px 0;opacity:0}100%{translate:40px 0;opacity:0}}
+[data-fig="mpc-horizon"] .mpc-co{transition:opacity 240ms var(--ease-out,cubic-bezier(.23,1,.32,1)) 120ms}
+[data-fig="mpc-horizon"] .mpc-co.off{opacity:0;transition:opacity 90ms var(--ease-out,cubic-bezier(.23,1,.32,1))}
+[data-fig="mpc-horizon"] .mpc-ghost-w{transition:opacity 320ms var(--ease-out,cubic-bezier(.23,1,.32,1))}
+[data-fig="mpc-horizon"].mpc-live .mpc-ghost-w{opacity:0;transition:opacity 140ms var(--ease-out,cubic-bezier(.23,1,.32,1))}
+[data-fig="mpc-horizon"].mpc-ready{cursor:col-resize;-webkit-tap-highlight-color:transparent}
+[data-live="hover"] [data-fig="mpc-horizon"].mpc-ready{cursor:inherit}
+[data-fig="mpc-horizon"]:focus{outline:none}
+[data-fig="mpc-horizon"]:focus-visible{outline:2px solid var(--fig-ink,#1342ff);outline-offset:6px;border-radius:8px}</style>
+<defs>
+<pattern id="mpc-horizon-d25" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="translate(-.5 -.5)"><rect class="i" width="2" height="2"/></pattern>
+<pattern id="mpc-horizon-h" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="translate(-.5 -.5)"><path class="s" d="M0 5L5 0"/></pattern>
+</defs>
+<g transform="translate(.5 .5)">
+<g data-part="frame" style="--i:0;--lift:0">
+<path class="f0" d="M400 70H800V430H400Z"/>
+<path class="s" vector-effect="non-scaling-stroke" d="M100 276H820M100 276V78M100 430H850M100 430V312M120 431v4M160 431v4M200 431v4M240 431v4M280 431v4M320 431v4M360 431v4M400 431v4M440 431v4M480 431v4M520 431v4M560 431v4M600 431v4M640 431v4M680 431v4M720 431v4M760 431v4M800 431v4"/>
+<path class="i" d="M100 72L103 77L97 77ZM100 306L103 311L97 311ZM856 430L851 433L851 427Z"/>
+<text class="i" x="84" y="78">y</text>
+<text class="i" x="84" y="312">u</text>
+<text class="i" x="862" y="434">t</text>
+</g>
+<path class="g mpc-horizon-ghost" vector-effect="non-scaling-stroke" stroke-dasharray="4 4" d="M400 70H800V276H400ZM400 310H800V430H400Z"/>
+<g data-part="past-u" style="--i:1">
+<path class="f1" d="M120 410H160V430H120ZM160 410H200V430H160ZM200 410H240V430H200ZM240 410H280V430H240ZM280 383.54H320V430H280ZM320 363.52H360V430H320ZM360 348.83H400V430H360Z"/>
+<path fill="url(#mpc-horizon-d25)" opacity=".35" d="M120 410H160V430H120ZM160 410H200V430H160ZM200 410H240V430H200ZM240 410H280V430H240ZM280 383.54H320V430H280ZM320 363.52H360V430H320ZM360 348.83H400V430H360Z"/>
+<path class="s" vector-effect="non-scaling-stroke" d="M120 430V410H160M160 430V410H200M200 430V410H240M240 430V410H280M280 430V383.54H320M320 430V363.52H360M360 430V348.83H400M400 348.83V430"/>
+</g>
+<g data-part="plan-u" style="--i:4">
+<path class="f3" d="M400 338.43H440V430H400Z"/>
+<path fill="url(#mpc-horizon-h)" opacity=".45" d="M400 338.43H440V348.83H400Z"/>
+<path class="s" vector-effect="non-scaling-stroke" d="M400 338.43H440V430M400 348.83H440"/>
+<path class="fl" d="M440 331.08H480V430H440ZM480 326.07H520V430H480ZM520 322.8H560V430H520Z"/>
+<path fill="url(#mpc-horizon-h)" opacity=".22" d="M440 331.08H480V338.43H440ZM480 326.07H520V331.08H480ZM520 322.8H560V326.07H520Z"/>
+<path class="s" vector-effect="non-scaling-stroke" stroke-dasharray="4 4" d="M440 338.43V331.08H480M480 331.08V326.07H520M520 326.07V322.8H560M560 322.8V430"/>
+<path class="s" vector-effect="non-scaling-stroke" stroke-dasharray="2 2" d="M480 331.08V430M520 326.07V430"/>
+<path class="g" vector-effect="non-scaling-stroke" stroke-dasharray="4 4" d="M560 322.8H800"/>
+</g>
+<g data-part="reference" style="--i:3">
+<path class="s" vector-effect="non-scaling-stroke" stroke-dasharray="4 4" d="M280 236V96H816"/>
+</g>
+<g data-part="past-y" style="--i:2">
+<path class="s" vector-effect="non-scaling-stroke" stroke-width="2" d="M120 240L160 240L200 240L240 240L280 240L320 230.48L360 215.65L400 198.5"/>
+<path class="i" d="M117.5 240a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0M157.5 240a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0M197.5 240a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0M237.5 240a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0M277.5 240a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0M317.5 230.48a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0M357.5 215.65a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0"/>
+</g>
+<g data-part="prediction" style="--i:4">
+<path class="s" vector-effect="non-scaling-stroke" d="M400 198.5L440 181.03L480 164.41L520 149.32L560 136.06L600 125.46L640 116.97L680 110.19L720 104.76L760 100.41L800 96.94"/>
+<path class="fl" d="M437 181.03a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M477 164.41a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M517 149.32a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M557 136.06a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M597 125.46a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M637 116.97a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M677 110.19a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M717 104.76a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M757 100.41a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M797 96.94a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+<path class="s" vector-effect="non-scaling-stroke" d="M437 181.03a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M477 164.41a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M517 149.32a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M557 136.06a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M597 125.46a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M637 116.97a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M677 110.19a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M717 104.76a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M757 100.41a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M797 96.94a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+</g>
+<g data-part="now" style="--i:3;--lift:0">
+<path class="s" vector-effect="non-scaling-stroke" d="M400 40V438"/>
+<path class="fl" d="M394.5 198.5a5.5 5.5 0 1 0 11 0a5.5 5.5 0 1 0 -11 0"/>
+<path class="s" vector-effect="non-scaling-stroke" d="M394.5 198.5a5.5 5.5 0 1 0 11 0a5.5 5.5 0 1 0 -11 0"/>
+<path class="i" d="M397.5 198.5a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0"/>
+</g>
+<g data-part="labels" style="--i:5;--lift:0">
+<path class="s" vector-effect="non-scaling-stroke" d="M120 59v-10M400 59v-10M121 54H238M282 54H399M400 59v-10M800 59v-10M401 54H516M683 54H799M400 463v-10M560 463v-10M401 458H559M207.2 154H274.5M640 201V125.47M420 302V332.93"/>
+<path class="i" d="M121 54L126 51.5L126 56.5ZM399 54L394 56.5L394 51.5ZM401 54L406 51.5L406 56.5ZM799 54L794 56.5L794 51.5ZM401 458L406 455.5L406 460.5ZM559 458L554 460.5L554 455.5ZM279.5 154L274.5 157L274.5 151ZM640 120.47L643 125.47L637 125.47ZM420 337.93L417 332.93L423 332.93ZM668.9 54.5h1v1h-1zM669.9 54.5h1v1h-1zM670.9 54.5h1v1h-1zM668.9 55.5h1v1h-1zM671.9 55.5h1v1h-1zM668.9 56.5h1v1h-1zM671.9 56.5h1v1h-1zM668.9 57.5h1v1h-1zM669.9 57.5h1v1h-1zM670.9 57.5h1v1h-1zM668.9 58.5h1v1h-1zM694.24 458.5h1v1h-1zM695.24 458.5h1v1h-1zM696.24 458.5h1v1h-1zM693.24 459.5h1v1h-1zM693.24 460.5h1v1h-1zM694.24 461.5h1v1h-1zM695.24 461.5h1v1h-1zM696.24 461.5h1v1h-1z"/>
+<text class="i" x="246" y="58">PAST</text><text class="i" x="524" y="58">PREDICTION HORIZON N</text><text class="i" x="570" y="462">CONTROL HORIZON N</text><text class="i" x="374.84" y="32">NOW (k)</text><text class="i" x="120" y="158">REFERENCE r</text><text class="i" x="632" y="214">PREDICTED ŷ</text><text class="i" x="412" y="298">APPLIED u(k)</text>
+</g>
+</g>
+</svg>

@@ -1,0 +1,190 @@
+---
+// The header brand: the Compass KA mark, linking home (motion in
+// src/scripts/brand-compass.ts). The K's leg is an arc centred on the A's apex
+// that runs on through the A as its crossbar.
+//
+// At rest it is the delivered path, verbatim (experiments/logo-lab/ka/concepts/
+// compass.svg), in currentColor, 18px from cap line to baseline, centred in
+// the same 32px box the pixel KA had, so nothing else in the header moves.
+// Two stories add to it, and both end on that rest path:
+// - the intro, on every fresh page open (not on in-site navigation): the delivered path under a mask of wide
+//   reveal strokes (stem and A legs, the arm, then the arc swept about the
+//   apex), each clipped to its stroke's cell so nothing shows early, with a
+//   hairline radius and construction arc as the compass;
+// - the hover (also keyboard focus and touch press): the arc retracts into
+//   the joint and is swept again about the apex, from the parts (stem, arm,
+//   legs, and the arc under a half-plane mask turning about the apex), with
+//   no construction shown.
+// Without JS it is the rest mark alone.
+import { compass } from '../lib/compass-mark';
+
+const size = 18; // mark height, CSS px
+const r3 = (n: number) => +n.toFixed(3);
+const k = 180 / size; // units per CSS px
+const [x0, , x1] = compass.bbox;
+const markW = x1 - x0;
+const width = Math.ceil(size * (markW / 180));
+const vbW = width * k;
+const vx = x0 + markW / 2 - vbW / 2; // the mark centred in a whole-pixel width
+
+const uid = 'brand-cm';
+const [ax, ay] = compass.apex;
+const R = compass.rMid;
+const on = (deg: number) => {
+  const t = (deg * Math.PI) / 180;
+  return `${r3(ax + R * Math.cos(t))} ${r3(ay + R * Math.sin(t))}`;
+};
+const guideArc = `M${on(160)}A${R} ${R} 0 0 0 ${on(55)}`;
+const a0 = (compass.a0 * Math.PI) / 180;
+const radiusTip = [r3(ax + compass.rOut * Math.cos(a0)), r3(ay + compass.rOut * Math.sin(a0))];
+const cells = ['stem', 'a', 'arm', 'arc'] as const;
+const reveals = [
+  ['stem', 'stem'],
+  ['a', 'legL'],
+  ['a', 'legR'],
+  ['arm', 'arm'],
+  ['arc', 'arc'],
+] as const;
+// Pre-paint: the intro plays whenever the page is opened fresh (first launch,
+// a reload, arriving from another site), not when moving between pages here.
+// The script takes the flag over before DOMContentLoaded (module scripts run
+// first, however long they take to load); if it never ran, the rest mark is
+// shown then. No timer, so a slow first load never cancels the intro.
+const gate = `(()=>{try{const n=performance.getEntriesByType('navigation')[0],r=document.referrer;if(n&&n.type!=='reload'&&r&&new URL(r).origin===location.origin)return}catch{}const d=document.documentElement;d.dataset.cmIntro='';addEventListener('DOMContentLoaded',()=>setTimeout(()=>{delete d.dataset.cmIntro}))})()`;
+---
+
+<a class="brand" href="/" aria-label="Kaan Altaş, home" data-brand-compass>
+  <script is:inline set:html={gate} />
+  <svg
+    class="cm"
+    viewBox={`0 0 ${r3(vbW)} 180`}
+    width={width}
+    height={size}
+    style={`--k:${r3(k)}`}
+    aria-hidden="true"
+    focusable="false"
+  >
+    {/* The viewBox starts at 0 0 and this group places the drawing, so a CSS
+        transform origin of 0 0 is user-space (0, 0) in every browser. */}
+    <g transform={`translate(${r3(-vx)} -30)`}>
+      <defs>
+        {
+          cells.map((c) => (
+            <clipPath id={`${uid}-${c}`} clipPathUnits="userSpaceOnUse">
+              <path d={compass.cells[c]} />
+            </clipPath>
+          ))
+        }
+        <mask id={`${uid}-draw`} maskUnits="userSpaceOnUse" x="-400" y="-400" width="1120" height="1040">
+          <g fill="none" stroke="#fff" stroke-linecap="butt" stroke-dasharray="1 2" stroke-dashoffset="1">
+            {
+              reveals.map(([cell, r]) => (
+                <g clip-path={`url(#${uid}-${cell})`}>
+                  <path data-rv={r} d={compass.reveal[r].d} stroke-width={compass.reveal[r].w} pathLength="1" />
+                </g>
+              ))
+            }
+          </g>
+        </mask>
+        <mask id={`${uid}-sweep`} maskUnits="userSpaceOnUse" x="-1200" y="-1200" width="2600" height="2600">
+          <g class="cm-sweeper"><rect x={ax - 1200} y={ay} width="2400" height="1200" fill="#fff"></rect></g>
+        </mask>
+      </defs>
+
+      {/* Construction, under the ink. */}
+      <g class="cm-guides" fill="none" stroke="currentColor" stroke-width={r3(k)}>
+        <path class="cm-arc-guide" d={guideArc}></path>
+        <g class="cm-spin"><line class="cm-radius" x1={ax} y1={ay} x2={radiusTip[0]} y2={radiusTip[1]}></line></g>
+      </g>
+
+      <path class="cm-rest" d={compass.d}></path>
+
+      {/* Intro ink: the rest path, revealed stroke by stroke. */}
+      <path class="cm-draw" d={compass.d} mask={`url(#${uid}-draw)`}></path>
+
+      {/* Hover ink: the parts; the arc under the turning half-plane. */}
+      <g class="cm-parts">
+        <path d={compass.stem + compass.arm + compass.legs}></path>
+        <path d={compass.arc} mask={`url(#${uid}-sweep)`}></path>
+      </g>
+    </g>
+  </svg>
+</a>
+
+<style>
+  /* The box the pixel KA had (Nav.astro): 32px, rounded, a small press. */
+  .brand {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 9px;
+    text-decoration: none;
+    color: var(--text);
+    -webkit-tap-highlight-color: transparent;
+    transition: scale var(--dur-quick) var(--spring-quick);
+  }
+
+  .brand:active {
+    scale: 0.94;
+  }
+
+  @media (max-width: 379.98px) {
+    .brand {
+      width: 28px;
+    }
+  }
+
+  .cm {
+    display: block;
+    overflow: visible;
+    fill: currentColor;
+  }
+
+  /* Which ink shows: the rest path, the intro's masked path or the parts. */
+  .cm-draw,
+  .cm-parts,
+  .cm-guides,
+  .cm[data-ink='draw'] .cm-rest,
+  .cm[data-ink='parts'] .cm-rest {
+    display: none;
+  }
+
+  .cm[data-ink='draw'] .cm-draw,
+  .cm[data-ink='parts'] .cm-parts,
+  .cm[data-mode='intro'] .cm-guides {
+    display: inline;
+  }
+
+  /* The intro's compass: a 1px hairline in the mark's colour. */
+  .cm-guides {
+    opacity: 0;
+  }
+
+  .cm-arc-guide {
+    stroke-opacity: 0.32;
+  }
+
+  .cm-radius {
+    stroke-opacity: 0.6;
+  }
+
+  /* Rotations about the apex are written out in full by the script
+     (translate, rotate, translate back) from the user-space origin. */
+  :is(.cm-spin, .cm-sweeper) {
+    transform-box: view-box;
+    transform-origin: 0 0;
+  }
+
+  /* Until the once-per-session intro starts, the rest mark waits hidden. */
+  :global(html[data-cm-intro]) .cm-rest {
+    opacity: 0;
+  }
+</style>
+
+<script>
+  import { initBrandCompass } from '../scripts/brand-compass';
+
+  initBrandCompass();
+</script>

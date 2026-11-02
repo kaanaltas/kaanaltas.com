@@ -1,0 +1,20 @@
+---
+// A hand-drawn micro-icon with a small motion story (docs/design-system.md §8).
+// The story plays when the icon's nearest interactive ancestor (a, button,
+// [data-micro-trigger], or a selected [role=option]) is hovered with a fine
+// pointer or focused from the keyboard. Markup: src/lib/micro-icons.ts.
+// Motion: src/styles/micro.css.
+import { microSvg, type MicroName, type MicroSize } from '../lib/micro-icons';
+
+interface Props {
+  name: MicroName;
+  size?: MicroSize;
+  /** Accessible name. Omit for decorative icons (the default): they get aria-hidden. */
+  label?: string;
+  class?: string;
+}
+
+const { name, size = 16, label, class: className } = Astro.props;
+---
+
+<Fragment set:html={microSvg(name, { size, label, class: className })} />

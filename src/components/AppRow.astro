@@ -1,0 +1,212 @@
+---
+// One app in the /work Tools list, a hairline row like the research rows:
+// the app's own icon (Icon Composer renditions, light on light and dark on
+// dark) beside its name and status, one line, the stack, platform chips and
+// the store link (or a quiet "soon" when there is none). A live store link is
+// an ExtLink, so it gets the ↗ micro-icon. Every app gets the same row.
+//
+// Icons ship as lossless PNG: lossy WebP halves the colour resolution, which
+// softens the thin coloured strokes these icons are made of. Up to 4x, so
+// they stay crisp when a page is zoomed in.
+import { Image } from 'astro:assets';
+import BrandIcon from './BrandIcon.astro';
+import ExtLink from './ExtLink.astro';
+import { appIcons } from '../assets/apps';
+import { statusLabel, type App } from '../data/projects';
+
+interface Props {
+  app: App;
+}
+
+const { app } = Astro.props;
+const { id, name, blurb, platforms, status, icon, meta, store } = app;
+const tile = 64;
+const headingId = `app-${id}`;
+const art = appIcons[icon];
+---
+
+<li class="app" aria-labelledby={headingId}>
+  <div class="tile" aria-hidden="true">
+    <Image class="tile-color tile-color--light" src={art.light} alt="" width={tile} height={tile} densities={[1, 2, 3, 4]} format="png" />
+    <Image class="tile-color tile-color--dark" src={art.dark} alt="" width={tile} height={tile} densities={[1, 2, 3, 4]} format="png" />
+  </div>
+
+  <div class="body">
+    <div class="head">
+      <h3 id={headingId}>{name}</h3>
+      <span class="status label" data-status={status}>
+        <span class="status-dot" aria-hidden="true"></span>
+        {statusLabel[status]}
+      </span>
+    </div>
+    <p class="blurb">{blurb}</p>
+    {meta && <p class="meta label">{meta}</p>}
+
+    <div class="foot">
+      <ul role="list" class="chips" aria-label="Platforms">
+        {platforms.map((p) => <li class="chip label">{p}</li>)}
+      </ul>
+      {
+        store.href ? (
+          <ExtLink class="store link" href={store.href}>
+            <BrandIcon name="apple" size={14} class="store-icon" />
+            {store.label}
+          </ExtLink>
+        ) : (
+          <span class="store">
+            <BrandIcon name="apple" size={14} class="store-icon" />
+            {store.label}
+            {store.note && <span class="store-note label">{store.note}</span>}
+          </span>
+        )
+      }
+    </div>
+  </div>
+</li>
+
+<style>
+  .app {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    column-gap: var(--s-4);
+    padding-block: var(--s-5);
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* Tile: the rendition already carries its squircle and shadow. */
+  .tile {
+    width: 64px;
+    height: 64px;
+  }
+
+  .tile :global(.tile-color) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Match the page theme: the dark rendition only in dark mode, and vice versa. */
+  .tile :global(.tile-color--dark) {
+    display: none;
+  }
+
+  :global([data-theme='dark']) .tile :global(.tile-color--light) {
+    display: none;
+  }
+
+  :global([data-theme='dark']) .tile :global(.tile-color--dark) {
+    display: block;
+  }
+
+  .body {
+    min-width: 0;
+  }
+
+  .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
+  }
+
+  h3 {
+    font-size: var(--t-body);
+    line-height: 1.5;
+    font-weight: 550;
+    letter-spacing: -0.005em;
+  }
+
+  .blurb {
+    margin-top: var(--s-1);
+    color: var(--text-2);
+  }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: none;
+    white-space: nowrap;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text-2);
+  }
+
+  [data-status='building'] .status-dot {
+    background: conic-gradient(var(--text-2) 0 50%, transparent 0);
+    box-shadow: inset 0 0 0 1.25px var(--text-2);
+  }
+
+  [data-status='planned'] .status-dot {
+    background: transparent;
+    box-shadow: inset 0 0 0 1.25px var(--text-3);
+  }
+
+  /* Platforms left, store right, on every row and every width. */
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-2) var(--s-4);
+    padding-top: var(--s-3);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2);
+    margin: 0;
+    padding: 0;
+  }
+
+  .chip,
+  .meta {
+    text-transform: none;
+    letter-spacing: 0.01em;
+  }
+
+  .chip {
+    padding: 2px 8px;
+    border-radius: var(--r-pill);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    color: var(--text);
+  }
+
+  .meta {
+    margin-top: var(--s-2);
+  }
+
+  .store {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--t-sm);
+    font-weight: 450;
+    color: var(--text-2);
+    white-space: nowrap;
+  }
+
+  .store :global(.store-icon) {
+    color: var(--text-3);
+    translate: 0 -1px;
+  }
+
+  .store-note {
+    padding: 1px 6px;
+    border-radius: var(--r-sm);
+    background: var(--surface-2);
+    font-size: 0.6875rem;
+  }
+
+  @media (max-width: 479px) {
+    .app {
+      column-gap: var(--s-3);
+    }
+  }
+</style>

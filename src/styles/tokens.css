@@ -1,0 +1,223 @@
+/* Design tokens. Spec: docs/design-system.md */
+
+@font-face {
+  font-family: 'Departure Mono';
+  src: url('/fonts/DepartureMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-sans: 'Inter Variable', 'Inter Fallback', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-pixel: 'Departure Mono', var(--font-mono);
+
+  --t-display: clamp(2rem, 1.4rem + 2.4vw, 2.75rem);
+  --t-h1: 1.75rem;
+  --t-lede: 1.125rem;
+  --t-body: 1rem;
+  --t-sm: 0.875rem;
+  --t-label: 0.75rem;
+
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+  --s-10: 128px;
+
+  --measure: 640px;
+  --wide: 960px;
+  --landing: 560px;
+  --gutter: 16px;
+
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --spring-quick: linear(0, 0.056, 0.179, 0.325, 0.467, 0.593, 0.698, 0.782, 0.847, 0.895, 0.931, 0.956, 0.973, 0.984, 0.992, 0.996, 1);
+  --dur-quick: 330ms;
+  --spring-snappy: linear(0, 0.048, 0.16, 0.298, 0.441, 0.573, 0.687, 0.781, 0.855, 0.911, 0.951, 0.978, 0.996, 1.007, 1.013, 1.015, 1.015, 1.014, 1.012, 1.009, 1.007, 1.005, 1.004, 1.003, 1);
+  --dur-snappy: 650ms;
+  --spring-bounce: linear(0, 0.071, 0.234, 0.43, 0.618, 0.778, 0.901, 0.985, 1.036, 1.061, 1.068, 1.063, 1.052, 1.039, 1.026, 1.015, 1.007, 1.001, 0.997, 0.996, 0.995, 0.996, 0.996, 0.997, 1);
+  --dur-bounce: 710ms;
+  --spring-soft: linear(0, 0.05, 0.161, 0.29, 0.418, 0.533, 0.631, 0.712, 0.778, 0.83, 0.871, 0.903, 0.927, 0.946, 0.959, 0.97, 0.978, 0.984, 0.988, 0.991, 0.994, 0.995, 0.997, 0.997, 1);
+  --dur-soft: 820ms;
+  --dur-fade: 200ms;
+  --dur-exit: 160ms;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --gutter: 24px;
+  }
+}
+
+/* Light (default) */
+:root,
+:root[data-theme='light'] {
+  --bg: #fcfcfc;
+  --surface: #ffffff;
+  --surface-2: #f4f4f5;
+  --text: #1a1a1a;
+  --text-2: #6f6f6f;
+  --text-3: #8f8f8f;
+  --line: #ebebeb;
+  --line-strong: #d9d9d9;
+  --ul-rest: #d9d9d9;
+  --ul-hover: #6f6f6f;
+  --accent: #1342ff;
+  --accent-soft: #e6ebff;
+  --on-accent: #ffffff;
+  --focus: var(--accent);
+  --selection: #e6ebff;
+  --shadow-hair: 0 0 0 1px #0000000f, 0 1px 2px -1px #0000000f, 0 2px 4px 0 #0000000a;
+  --shadow-float: 0 0 0 1px #0000000d, 0 8px 24px -6px #00000026, 0 24px 64px -12px #0000001f;
+  --mesh-ink: 26 26 26;
+
+  --fig-ink: #1342ff;
+  --fig-lit: #ffffff;
+  --fig-50: #f4f5f9;
+  --fig-100: #e6ebff;
+  --fig-200: #b9c7fd;
+  --fig-300: #97acff;
+  --fig-400: #607ffd;
+  --fig-dot: rgb(19 66 255 / 0.15);
+  --fig-bg: var(--bg);
+  color-scheme: light;
+}
+
+/* Dark: explicit choice */
+:root[data-theme='dark'] {
+  --bg: #0f0f10;
+  --surface: #161618;
+  --surface-2: #1c1c1f;
+  --text: #ededed;
+  --text-2: #a1a1a1;
+  --text-3: #7a7a7a;
+  --line: #232326;
+  --line-strong: #2e2e32;
+  --ul-rest: #3a3a3e;
+  --ul-hover: #a1a1a1;
+  --accent: #7b93ff;
+  --accent-soft: #1c2340;
+  --on-accent: #0f0f10;
+  --selection: #243063;
+  --shadow-hair: 0 0 0 1px #ffffff12, 0 1px 2px -1px #00000066, 0 2px 4px 0 #00000040;
+  --shadow-float: 0 0 0 1px #ffffff14, 0 8px 24px -6px #00000099, 0 24px 64px -12px #00000080;
+  --mesh-ink: 237 237 237;
+
+  --fig-ink: #8fa3ff;
+  --fig-lit: #1b1f2b;
+  --fig-50: #161924;
+  --fig-100: #1c2236;
+  --fig-200: #25305a;
+  --fig-300: #34479a;
+  --fig-400: #5872f0;
+  --fig-dot: rgb(143 163 255 / 0.14);
+  color-scheme: dark;
+}
+
+/* Dark: system preference, when no explicit choice */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0f0f10;
+    --surface: #161618;
+    --surface-2: #1c1c1f;
+    --text: #ededed;
+    --text-2: #a1a1a1;
+    --text-3: #7a7a7a;
+    --line: #232326;
+    --line-strong: #2e2e32;
+    --ul-rest: #3a3a3e;
+    --ul-hover: #a1a1a1;
+    --accent: #7b93ff;
+    --accent-soft: #1c2340;
+    --on-accent: #0f0f10;
+    --selection: #243063;
+    --shadow-hair: 0 0 0 1px #ffffff12, 0 1px 2px -1px #00000066, 0 2px 4px 0 #00000040;
+    --shadow-float: 0 0 0 1px #ffffff14, 0 8px 24px -6px #00000099, 0 24px 64px -12px #00000080;
+    --mesh-ink: 237 237 237;
+
+    --fig-ink: #8fa3ff;
+    --fig-lit: #1b1f2b;
+    --fig-50: #161924;
+    --fig-100: #1c2236;
+    --fig-200: #25305a;
+    --fig-300: #34479a;
+    --fig-400: #5872f0;
+    --fig-dot: rgb(143 163 255 / 0.14);
+    color-scheme: dark;
+  }
+}
+
+/* Scoped palettes for side-by-side previews (lab pages) */
+.swatch[data-theme='light'] {
+  --bg: #fcfcfc;
+  --surface: #ffffff;
+  --surface-2: #f4f4f5;
+  --text: #1a1a1a;
+  --text-2: #6f6f6f;
+  --text-3: #8f8f8f;
+  --line: #ebebeb;
+  --line-strong: #d9d9d9;
+  --ul-rest: #d9d9d9;
+  --ul-hover: #6f6f6f;
+  --accent: #1342ff;
+  --accent-soft: #e6ebff;
+  --on-accent: #ffffff;
+  --focus: var(--accent);
+  --selection: #e6ebff;
+  --shadow-hair: 0 0 0 1px #0000000f, 0 1px 2px -1px #0000000f, 0 2px 4px 0 #0000000a;
+  --shadow-float: 0 0 0 1px #0000000d, 0 8px 24px -6px #00000026, 0 24px 64px -12px #0000001f;
+  --mesh-ink: 26 26 26;
+
+  --fig-ink: #1342ff;
+  --fig-lit: #ffffff;
+  --fig-50: #f4f5f9;
+  --fig-100: #e6ebff;
+  --fig-200: #b9c7fd;
+  --fig-300: #97acff;
+  --fig-400: #607ffd;
+  --fig-dot: rgb(19 66 255 / 0.15);
+  --fig-bg: var(--bg);
+  color-scheme: light;
+}
+.swatch[data-theme='dark'] {
+  --bg: #0f0f10;
+  --surface: #161618;
+  --surface-2: #1c1c1f;
+  --text: #ededed;
+  --text-2: #a1a1a1;
+  --text-3: #7a7a7a;
+  --line: #232326;
+  --line-strong: #2e2e32;
+  --ul-rest: #3a3a3e;
+  --ul-hover: #a1a1a1;
+  --accent: #7b93ff;
+  --accent-soft: #1c2340;
+  --on-accent: #0f0f10;
+  --selection: #243063;
+  --shadow-hair: 0 0 0 1px #ffffff12, 0 1px 2px -1px #00000066, 0 2px 4px 0 #00000040;
+  --shadow-float: 0 0 0 1px #ffffff14, 0 8px 24px -6px #00000099, 0 24px 64px -12px #00000080;
+  --mesh-ink: 237 237 237;
+
+  --fig-ink: #8fa3ff;
+  --fig-lit: #1b1f2b;
+  --fig-50: #161924;
+  --fig-100: #1c2236;
+  --fig-200: #25305a;
+  --fig-300: #34479a;
+  --fig-400: #5872f0;
+  --fig-dot: rgb(143 163 255 / 0.14);
+  color-scheme: dark;
+}

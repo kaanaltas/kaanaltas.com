@@ -1,0 +1,77 @@
+---
+// Not found: the site's own page header, one line, and the way back.
+import Base from '../layouts/Base.astro';
+import MicroIcon from '../components/MicroIcon.astro';
+---
+
+<Base title="Not found" description="This page does not exist.">
+  <meta slot="head" name="robots" content="noindex" />
+  <div class="page container">
+    <header class="intro enter">
+      <p class="code label num">404</p>
+      <h1>Nothing here</h1>
+      <p class="lede">This page doesn’t exist, or it has moved.</p>
+      <p class="back">
+        <a class="link" href="/">Back to the start<MicroIcon name="arrow-right" class="link-icon" /></a>
+        <span class="or">or press <kbd><span data-mod-key>⌘</span>K</kbd> to search</span>
+      </p>
+    </header>
+  </div>
+</Base>
+
+<style>
+  .page {
+    padding-block: var(--s-9) var(--s-9);
+  }
+
+  .code {
+    color: var(--text-3);
+    letter-spacing: 0.06em;
+  }
+
+  h1 {
+    margin-top: var(--s-2);
+    font-size: var(--t-h1);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .lede {
+    margin-top: var(--s-2);
+    color: var(--text-2);
+  }
+
+  .back {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2) var(--s-5);
+    margin-top: var(--s-6);
+  }
+
+  .back .link {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .or {
+    font-size: var(--t-sm);
+    color: var(--text-3);
+  }
+
+  kbd {
+    padding: 1px 5px;
+    border-radius: 5px;
+    font: inherit;
+    font-size: 12px;
+    color: var(--text-2);
+    box-shadow: 0 0 0 1px var(--line-strong);
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    :global(html:not(.kbd)) .or {
+      display: none;
+    }
+  }
+</style>

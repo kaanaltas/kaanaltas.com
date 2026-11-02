@@ -1,0 +1,41 @@
+---
+// One CV section: "/ Title" heading plus content. The id is an anchor
+// target for the command palette, so keep ids stable.
+interface Props {
+  id: string;
+  title: string;
+  class?: string;
+}
+
+const { id, title, class: className } = Astro.props;
+---
+
+<section class:list={['cv-section', className]} id={id} aria-labelledby={`${id}-title`}>
+  <h2 class="section-title" id={`${id}-title`}><span class="slash" aria-hidden="true">/</span>{title}</h2>
+  <slot />
+</section>
+
+<style>
+  .cv-section {
+    scroll-margin-top: 72px;
+  }
+  .cv-section + :global(.cv-section) {
+    margin-top: var(--s-8);
+  }
+  .section-title {
+    margin-bottom: var(--s-2);
+  }
+  @media (min-width: 640px) {
+    .cv-section + :global(.cv-section) {
+      margin-top: 80px;
+    }
+  }
+  @media print {
+    .cv-section + :global(.cv-section) {
+      margin-top: 18pt;
+    }
+    .section-title {
+      break-after: avoid;
+    }
+  }
+</style>

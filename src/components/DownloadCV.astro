@@ -1,0 +1,179 @@
+---
+// "Download CV" button. A real link (works without JS); with JS the click runs
+// downloadCV(), which downloads the PDF and shows a friendly toast. The button
+// itself confirms with a quick 3D flip to a "Downloaded" back face; the toast
+// follows just after the flip lands. The toast owns the announcement (it has
+// the live region), so the back face is aria-hidden and the accessible name
+// stays "Download CV".
+import { person } from '../data/cv';
+
+interface Props {
+  label?: string;
+  class?: string;
+}
+
+const { label = 'Download CV', class: className } = Astro.props;
+---
+
+<a
+  class:list={['dl-cv', 'pressable', className]}
+  href={person.cvPdf}
+  download="Kaan-Altas-CV.pdf"
+  data-download-cv
+>
+  <span class="dl-cv__card">
+    <span class="dl-cv__face dl-cv__front">
+      <svg class="dl-cv__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path d="M4.75 14.75v3.5a1 1 0 0 0 1 1h12.5a1 1 0 0 0 1-1v-3.5"></path>
+        <g class="icon icon--nudge-down">
+          <path d="M12 4.75v9.5"></path>
+          <path d="M8.25 10.75 12 14.5l3.75-3.75"></path>
+        </g>
+      </svg>
+      <span>{label}</span>
+      <span class="dl-cv__meta" aria-hidden="true">PDF</span>
+    </span>
+    <span class="dl-cv__face dl-cv__back" aria-hidden="true">
+      <svg class="dl-cv__icon dl-cv__check" viewBox="0 0 24 24" width="18" height="18">
+        <path pathLength="1" d="M5.75 12.75 9.75 16.5l8.5-9"></path>
+      </svg>
+      <span>Downloaded</span>
+    </span>
+  </span>
+</a>
+
+<style>
+  .dl-cv {
+    --flip-dur: 450ms;
+    position: relative;
+    display: inline-grid;
+    border-radius: 10px;
+    color: var(--text);
+    font-size: var(--t-sm);
+    font-weight: 450;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    /* The card turns in this space. Short distance = a little depth, not a lot. */
+    perspective: 420px;
+  }
+
+  /* Both faces share one grid cell, so the card is always as wide as the
+     wider face and the button never changes size when it turns over. */
+  .dl-cv__card {
+    display: grid;
+    transform-style: preserve-3d;
+    transition: transform var(--flip-dur) var(--spring-snappy);
+  }
+
+  .dl-cv__face {
+    grid-area: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-2);
+    height: 36px;
+    padding: 0 var(--s-3) 0 10px;
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: var(--shadow-hair);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transition:
+      background-color 200ms var(--ease-out),
+      box-shadow 200ms var(--ease-out);
+  }
+
+  .dl-cv__back {
+    transform: rotateX(180deg);
+  }
+
+  .dl-cv.is-flipped .dl-cv__card {
+    transform: rotateX(-180deg);
+  }
+
+  .dl-cv__icon {
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    overflow: visible;
+    color: var(--text-2);
+    transition: color 200ms var(--ease-out);
+  }
+
+  .dl-cv__meta {
+    margin-left: 2px;
+    padding: 3px 5px;
+    border-radius: 4px;
+    background: var(--surface-2);
+    color: var(--text-2);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 450;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  /* Check draws in as the back face comes round (design-system section 8). It
+     resets only after the card is face-front again (.is-confirmed is cleared
+     late), so it never visibly un-draws. Only the tick is green; the face
+     stays the same quiet button. */
+  .dl-cv__check {
+    color: #15803d;
+    stroke-width: 1.75;
+  }
+
+  :global([data-theme='dark']) .dl-cv__check {
+    color: #4ade80;
+  }
+
+  .dl-cv__check path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  .dl-cv.is-confirmed .dl-cv__check path {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 400ms var(--ease-out) 180ms;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .dl-cv:hover .dl-cv__front {
+      background: var(--surface-2);
+    }
+    .dl-cv:hover .dl-cv__front .dl-cv__icon {
+      color: var(--text);
+    }
+    .dl-cv:hover .dl-cv__meta {
+      background: var(--surface);
+    }
+  }
+
+  .dl-cv:focus-visible {
+    border-radius: 10px;
+  }
+</style>
+
+<script>
+  import { downloadCV } from '../scripts/download-cv';
+  import { flipConfirm, FLIP_MS } from '../scripts/flip-confirm';
+
+  for (const el of document.querySelectorAll<HTMLAnchorElement>('[data-download-cv]')) {
+    el.addEventListener('click', (e) => {
+      // Let modified clicks (new tab, save as...) do their native thing.
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      // A second click while the "Downloaded" face is up only extends the hold:
+      // no duplicate download, no second toast.
+      if (!flipConfirm(el)) return;
+      // The toast lands just after the flip does, so the two read as one beat.
+      downloadCV({ toastDelay: FLIP_MS - 30 });
+    });
+  }
+</script>

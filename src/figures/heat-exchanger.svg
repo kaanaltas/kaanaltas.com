@@ -1,0 +1,203 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 614" fill="none" class="fig" data-fig="heat-exchanger" data-states="closed open" role="img" aria-labelledby="heat-exchanger-title heat-exchanger-desc">
+<title id="heat-exchanger-title">Shell-and-tube heat exchanger — two-pass U-tube section</title>
+<desc id="heat-exchanger-desc">Four hollow U-tubes return the cold stream from the lower channel chamber to the upper outlet. A sealed divider separates the two channel chambers. The hot shell-side stream enters at the upper left, passes through alternating segmental-baffle windows, and leaves at the lower right. Hatched walls and tube sheet show sectioned metal; arrowheads distinguish the two fluid circuits without mixing them. The assembled view shows the same unit from outside: shell, bolted girth flange with the tube-sheet rim, channel bonnet, nozzles and saddles. Probe layer (hidden at rest): pointing along the section places a thermocouple traverse at that station and reads the shell and both tube-pass temperatures from the 1-2 exchanger model - shell fluid mixed over each cross-section, plug flow in each pass, constant U, U-bend area not counted - for hot in 150 °C, cold in 30 °C, Cc/Ch = 0.8, UA/Cc = 1.5: hot out 95.5 °C, cold out 98.2 °C, F = 0.78. Arrows give the local heat-flow direction; past x/L = 0.93 the upper pass is hotter than the shell and returns heat to it. Below the section, a temperature profile from the same model: shell T and both tube passes against x/L (axis aligned with the straight tube length), the cross marked; while probing, a cursor follows the station.</desc>
+<style>
+[data-fig="heat-exchanger"] .s {stroke:var(--fig-ink,#1342ff);stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter}
+[data-fig="heat-exchanger"] .i {fill:var(--fig-ink,#1342ff)}
+[data-fig="heat-exchanger"] .fl {fill:var(--fig-lit,#ffffff)}
+[data-fig="heat-exchanger"] .f0 {fill:var(--fig-50,#f4f5f9)}
+[data-fig="heat-exchanger"] .f1 {fill:var(--fig-100,#e6ebff)}
+[data-fig="heat-exchanger"] .f2 {fill:var(--fig-200,#b9c7fd)}
+[data-fig="heat-exchanger"] .f3 {fill:var(--fig-300,#97acff)}
+[data-fig="heat-exchanger"] .g {stroke:var(--fig-400,#607ffd)}
+[data-fig="heat-exchanger"] .h {fill:url(#heat-exchanger-hatch);fill-opacity:.45}
+[data-fig="heat-exchanger"] .d25 {fill:url(#heat-exchanger-d25);fill-opacity:.35}
+[data-fig="heat-exchanger"] .d50 {fill:url(#heat-exchanger-d50);fill-opacity:.35}
+[data-fig="heat-exchanger"] .d75 {fill:url(#heat-exchanger-d75);fill-opacity:.35}
+[data-fig="heat-exchanger"] text {font-family:'Departure Mono',ui-monospace,monospace;font-size:11px;font-weight:400;letter-spacing:.02em}
+[data-fig="heat-exchanger"] .flow {stroke-dasharray:4 4}
+[data-fig="heat-exchanger"] [data-closed-only] {opacity:0}
+.is-closed [data-fig="heat-exchanger"] [data-closed-only] {opacity:1}
+:where(.fig-frame) [data-fig="heat-exchanger"] [data-part] {opacity:0;translate:0 calc(var(--lift,-40)*1px);transition:translate 820ms var(--spring-soft,cubic-bezier(.23,1,.32,1)) calc(var(--i)*110ms),opacity 400ms ease calc(var(--i)*110ms)}
+.is-in [data-fig="heat-exchanger"] [data-part],[data-fig="heat-exchanger"].is-in [data-part] {opacity:1;translate:0 0}
+.is-in [data-fig="heat-exchanger"] .flow,[data-fig="heat-exchanger"].is-in .flow {animation:heat-exchanger-flow 3.2s linear infinite}
+@keyframes heat-exchanger-flow {to {stroke-dashoffset:-24}}
+[data-fig="heat-exchanger"] [data-move] {--t-move:900ms;--ease-move:var(--ease-in-out);--d-close:80ms}
+[data-fig="heat-exchanger"] .ext {--t-fade:0s;--d-open:900ms}
+[data-fig="heat-exchanger"] .int {--t-fade:0s;--d-close:980ms}
+[data-fig="heat-exchanger"] .late {--t-fade:220ms;--d-open:700ms}
+[data-fig="heat-exchanger"] .fa {--t-fade:200ms;--d-close:560ms}
+[data-fig="heat-exchanger"] .hx-live {opacity:0;pointer-events:none;transition:opacity 320ms var(--ease-out,cubic-bezier(.23,1,.32,1))}
+[data-fig="heat-exchanger"].hx-on .hx-live {opacity:1;transition-duration:180ms}
+.is-closed [data-fig="heat-exchanger"] .hx-live {opacity:0;transition-duration:120ms}
+[data-fig="heat-exchanger"] .hx-ro-l,[data-fig="heat-exchanger"].hx-left .hx-ro-r {opacity:0}
+[data-fig="heat-exchanger"].hx-left .hx-ro-l {opacity:1}
+[data-fig="heat-exchanger"] .hx-rest {transition:opacity 240ms var(--ease-out,cubic-bezier(.23,1,.32,1)) 120ms}
+[data-fig="heat-exchanger"].hx-on .hx-rest {opacity:0;transition-duration:140ms;transition-delay:0s}
+</style>
+<defs>
+<pattern id="heat-exchanger-hatch" width="10" height="10" patternUnits="userSpaceOnUse"><path class="s" d="M0 10L10 0" vector-effect="non-scaling-stroke"/></pattern>
+<pattern id="heat-exchanger-d25" width="4" height="4" patternUnits="userSpaceOnUse"><rect class="i" x="0" y="0" width="2" height="2"/></pattern>
+<pattern id="heat-exchanger-d50" width="4" height="4" patternUnits="userSpaceOnUse"><rect class="i" x="0" y="0" width="2" height="2"/><rect class="i" x="2" y="2" width="2" height="2"/></pattern>
+<pattern id="heat-exchanger-d75" width="4" height="4" patternUnits="userSpaceOnUse"><rect class="i" x="0" y="0" width="2" height="2"/><rect class="i" x="2" y="0" width="2" height="2"/><rect class="i" x="2" y="2" width="2" height="2"/></pattern>
+<clipPath id="heat-exchanger-fluid-spaces"><path class="fl" d="M680 140H260C210 140 170 180 170 230C170 280 210 320 260 320H680Z M695 150H300A80 80 0 0 0 300 310H695V300H300A70 70 0 0 1 300 160H695Z M695 170H300A60 60 0 0 0 300 290H695V280H300A50 50 0 0 1 300 180H695Z M695 190H300A40 40 0 0 0 300 270H695V260H300A30 30 0 0 1 300 200H695Z M695 210H300A20 20 0 0 0 300 250H695V240H300A10 10 0 0 1 300 220H695Z" clip-rule="evenodd"/><path class="fl" d="M695 172H300A58 58 0 0 0 300 288H695V282H300A52 52 0 0 1 300 178H695Z"/><path class="fl" d="M695 140H750C775 140 795 180 795 227.5H695Z M695 232.5H795C795 280 775 320 750 320H695Z M290 40H310V140H290Z M635 320H655V415H635Z M720 40H740V140H720Z M720 320H740V415H720Z"/></clipPath>
+<clipPath id="heat-exchanger-skin"><path d="M670 130H260C205 130 160 175 160 230C160 285 205 330 260 330H670Z M670 120h35v220h-35Z M705 130H750C780 130 805 175 805 230C805 285 780 330 750 330H705Z"/></clipPath>
+<clipPath id="heat-exchanger-outline"><path d="M670 130H260C205 130 160 175 160 230C160 285 205 330 260 330H670Z M670 120h35v220h-35Z M705 130H750C780 130 805 175 805 230C805 285 780 330 750 330H705Z M275 70h50v10h-50Z M285 80h30v50h-30Z M620 380h50v10h-50Z M630 330h30v50h-30Z M705 70h50v10h-50Z M715 80h30v50h-30Z M705 380h50v10h-50Z M715 330h30v50h-30Z"/></clipPath>
+<mask id="heat-exchanger-reveal" maskUnits="userSpaceOnUse" x="0" y="0" width="960" height="450"><g data-move="" style="--cx:665px;--cy:0px;--m:0"><path fill="#fff" d="M-525 40h675v380h-675Z"/></g></mask>
+</defs>
+<g data-part="support-saddles" style="--i:0">
+<path class="f1" d="M300 325h70v15h-70Z"/>
+<path class="f0" d="M315 340H355L365 385H305Z"/>
+<path class="f1" d="M295 385h80v5h-80Z"/>
+<path class="f1" d="M345 340H355L365 385H355Z"/>
+<path class="f1" d="M500 325h70v15h-70Z"/>
+<path class="f0" d="M515 340H555L565 385H505Z"/>
+<path class="f1" d="M495 385h80v5h-80Z"/>
+<path class="f1" d="M545 340H555L565 385H555Z"/>
+<path class="s" d="M300 325h70v15h-70Z M315 340H355L365 385H305Z M295 385h80v5h-80Z M305 387.5h10M355 387.5h10 M500 325h70v15h-70Z M515 340H555L565 385H505Z M495 385h80v5h-80Z M505 387.5h10M555 387.5h10" vector-effect="non-scaling-stroke"/>
+</g>
+<g data-part="shell" style="--i:1">
+<path class="f0" d="M680 130H260C205 130 160 175 160 230C160 285 205 330 260 330H680Z"/>
+<path class="f0" d="M290 70h20v70h-20Z"/>
+<path class="f0" d="M635 320h20v70h-20Z"/>
+<path class="f1" d="M290 70H275V80H285V130H260C205 130 160 175 160 230C160 285 205 330 260 330H630V380H620V390H635V320H260C210 320 170 280 170 230C170 180 210 140 260 140H290Z M310 70H325V80H315V130H680V140H310Z M655 320H680V330H660V380H670V390H655Z"/>
+<path class="d25" d="M260 140C210 140 170 180 170 230C170 280 210 320 260 320V310C215 310 180 275 180 230C180 185 215 150 260 150Z"/>
+<path class="h" d="M290 70H275V80H285V130H260C205 130 160 175 160 230C160 285 205 330 260 330H630V380H620V390H635V320H260C210 320 170 280 170 230C170 180 210 140 260 140H290Z M310 70H325V80H315V130H680V140H310Z M655 320H680V330H660V380H670V390H655Z"/>
+<path class="s" d="M290 70H275V80H285V130H260C205 130 160 175 160 230C160 285 205 330 260 330H630V380H620V390H635V320H260C210 320 170 280 170 230C170 180 210 140 260 140H290Z M310 70H325V80H315V130H680V140H310Z M655 320H680V330H660V380H670V390H655Z M275 80H290M310 80H325M620 380H635M655 380H670" vector-effect="non-scaling-stroke"/>
+</g>
+<g class="int" data-open-only="">
+<g data-part="segmental-baffles" style="--i:2">
+<path class="f2" d="M355 146h3v129h-3Z"/>
+<path class="f2" d="M465 185h3v129h-3Z"/>
+<path class="f2" d="M575 146h3v129h-3Z"/>
+<path class="s" d="M355 146h3v129h-3Z M465 185h3v129h-3Z M575 146h3v129h-3Z" vector-effect="non-scaling-stroke"/>
+</g>
+</g>
+<g class="int" data-open-only="">
+<g data-part="tube-sheet" style="--i:2">
+<path class="f2" d="M680 120h15v220h-15Z"/>
+<path class="h" d="M680 120h15v220h-15Z"/>
+<path class="s" d="M680 120h15v220h-15Z" vector-effect="non-scaling-stroke"/>
+</g>
+</g>
+<g class="int" data-open-only="">
+<g data-part="hollow-u-tube-bundle" style="--i:3">
+<path class="f2" d="M695 150H300A80 80 0 0 0 300 310H695V300H300A70 70 0 0 1 300 160H695Z"/>
+<path class="fl" d="M695 152H300A78 78 0 0 0 300 308H695V302H300A72 72 0 0 1 300 158H695Z"/>
+<path class="f2" d="M695 170H300A60 60 0 0 0 300 290H695V280H300A50 50 0 0 1 300 180H695Z"/>
+<path class="fl" d="M695 172H300A58 58 0 0 0 300 288H695V282H300A52 52 0 0 1 300 178H695Z"/>
+<path class="f2" d="M695 190H300A40 40 0 0 0 300 270H695V260H300A30 30 0 0 1 300 200H695Z"/>
+<path class="fl" d="M695 192H300A38 38 0 0 0 300 268H695V262H300A32 32 0 0 1 300 198H695Z"/>
+<path class="f2" d="M695 210H300A20 20 0 0 0 300 250H695V240H300A10 10 0 0 1 300 220H695Z"/>
+<path class="fl" d="M695 212H300A18 18 0 0 0 300 248H695V242H300A12 12 0 0 1 300 218H695Z"/>
+<path class="s" d="M695 150H300A80 80 0 0 0 300 310H695 M695 152H300A78 78 0 0 0 300 308H695 M695 158H300A72 72 0 0 0 300 302H695 M695 160H300A70 70 0 0 0 300 300H695 M695 170H300A60 60 0 0 0 300 290H695 M695 172H300A58 58 0 0 0 300 288H695 M695 178H300A52 52 0 0 0 300 282H695 M695 180H300A50 50 0 0 0 300 280H695 M695 190H300A40 40 0 0 0 300 270H695 M695 192H300A38 38 0 0 0 300 268H695 M695 198H300A32 32 0 0 0 300 262H695 M695 200H300A30 30 0 0 0 300 260H695 M695 210H300A20 20 0 0 0 300 250H695 M695 212H300A18 18 0 0 0 300 248H695 M695 218H300A12 12 0 0 0 300 242H695 M695 220H300A10 10 0 0 0 300 240H695" vector-effect="non-scaling-stroke"/>
+</g>
+</g>
+<g data-part="divided-channel-head" style="--i:4">
+<path class="f0" d="M695 130H750C780 130 805 175 805 230C805 285 780 330 750 330H695Z"/>
+<path class="fl" d="M720 70h20v70h-20Z"/>
+<path class="fl" d="M720 320h20v70h-20Z"/>
+<path class="fl" d="M695 140H750C775 140 795 180 795 227.5H695Z"/>
+<path class="f1" d="M740 70H755V80H745V130H750C780 130 805 175 805 230C805 285 780 330 750 330H745V380H755V390H740V320H750C775 320 795 280 795 230C795 180 775 140 750 140H740Z M695 130H715V80H705V70H720V140H695Z M695 320H720V390H705V380H715V330H695Z M695 227.5H795V232.5H695Z"/>
+<path class="h" d="M740 70H755V80H745V130H750C780 130 805 175 805 230C805 285 780 330 750 330H745V380H755V390H740V320H750C775 320 795 280 795 230C795 180 775 140 750 140H740Z M695 130H715V80H705V70H720V140H695Z M695 320H720V390H705V380H715V330H695Z M695 227.5H795V232.5H695Z"/>
+<path class="s" d="M740 70H755V80H745V130H750C780 130 805 175 805 230C805 285 780 330 750 330H745V380H755V390H740V320H750C775 320 795 280 795 230C795 180 775 140 750 140H740Z M695 130H715V80H705V70H720V140H695Z M695 320H720V390H705V380H715V330H695Z M695 227.5H795V232.5H695Z M705 80H720M740 80H755M705 380H720M740 380H755" vector-effect="non-scaling-stroke"/>
+</g>
+<g data-part="mating-flanges" style="--i:4">
+<path class="f1" d="M670 120h10v15h-10Z"/>
+<path class="f1" d="M695 120h10v15h-10Z"/>
+<path class="f1" d="M670 325h10v15h-10Z"/>
+<path class="f1" d="M695 325h10v15h-10Z"/>
+<path class="h" d="M670 120h10v15h-10Z"/>
+<path class="h" d="M695 120h10v15h-10Z"/>
+<path class="h" d="M670 325h10v15h-10Z"/>
+<path class="h" d="M695 325h10v15h-10Z"/>
+<path class="s" d="M670 120h10v15h-10Z M695 120h10v15h-10Z M670 325h10v15h-10Z M695 325h10v15h-10Z" vector-effect="non-scaling-stroke"/>
+</g>
+<g data-part="flange-bolts" style="--i:4">
+<path class="fl" d="M665 125h45v5h-45Z"/>
+<path class="f0" d="M665 120h5v15h-5Z M705 120h5v15h-5Z"/>
+<path class="fl" d="M665 330h45v5h-45Z"/>
+<path class="f0" d="M665 325h5v15h-5Z M705 325h5v15h-5Z"/>
+<path class="s" d="M670 125H705M670 130H705 M665 120h5v15h-5Z M705 120h5v15h-5Z M670 330H705M670 335H705 M665 325h5v15h-5Z M705 325h5v15h-5Z" vector-effect="non-scaling-stroke"/>
+</g>
+<g data-part="fluid-circuits" style="--i:5" clip-path="url(#heat-exchanger-fluid-spaces)">
+<path class="i" d="M645 410L642.5 404L647.5 404Z M730 45L732.5 51L727.5 51Z"/>
+<path class="i int" data-open-only="" d="M300 145L297.5 139L302.5 139Z M405 293L407.5 299L402.5 299Z M505 167L502.5 161L507.5 161Z M730 380L732.5 386L727.5 386Z M555 285L561 282.5L561 287.5Z M555 175L549 177.5L549 172.5Z"/>
+<path class="i fa" data-closed-only="" d="M300 69L297.5 63L302.5 63Z M730 391L732.5 397L727.5 397Z"/>
+<path class="s flow" d="M300 45V145 M325 300Q325 315 345 315H385Q405 315 405 293 M435 160Q435 145 455 145H485Q505 145 505 167 M550 300Q550 315 570 315H615Q645 315 645 350V410 M730 410V295Q730 285 710 285H300A55 55 0 0 1 300 175H710Q730 175 730 155V45" vector-effect="non-scaling-stroke"/>
+</g>
+<g data-part="shell-exterior" style="--i:1">
+<g class="ext" data-closed-only="" mask="url(#heat-exchanger-reveal)">
+<path class="f0" d="M670 130H260C205 130 160 175 160 230C160 285 205 330 260 330H670Z"/>
+<g clip-path="url(#heat-exchanger-skin)">
+<path class="fl" d="M150 150h520v12h-520Z"/>
+<path class="d25" d="M150 284h520v28h-520Z"/>
+<path class="d50" d="M150 312h520v28h-520Z"/>
+</g>
+<path class="s" d="M670 130H260C205 130 160 175 160 230C160 285 205 330 260 330H670Z M260 130V330" vector-effect="non-scaling-stroke"/>
+<path class="f0" d="M285 80h30v50h-30Z"/>
+<path class="fl" d="M289 80h5v50h-5Z"/>
+<path class="d25" d="M306 80h9v50h-9Z"/>
+<path class="f1" d="M275 70h50v10h-50Z"/>
+<path class="f0" d="M630 330h30v50h-30Z"/>
+<path class="fl" d="M634 330h5v50h-5Z"/>
+<path class="d25" d="M651 330h9v50h-9Z"/>
+<path class="f1" d="M620 380h50v10h-50Z"/>
+<path class="s" d="M285 80h30v50h-30Z M275 70h50v10h-50Z M630 330h30v50h-30Z M620 380h50v10h-50Z" vector-effect="non-scaling-stroke"/>
+</g>
+</g>
+<g data-part="channel-exterior" style="--i:4">
+<g class="ext" data-closed-only="" mask="url(#heat-exchanger-reveal)">
+<path class="f1" d="M670 120h10v220h-10Z M695 120h10v220h-10Z"/>
+<path class="f2" d="M680 120h15v220h-15Z"/>
+<path class="f0" d="M705 130H750C780 130 805 175 805 230C805 285 780 330 750 330H705Z"/>
+<g clip-path="url(#heat-exchanger-skin)">
+<path class="d25" d="M670 284h35v28h-35Z"/>
+<path class="d50" d="M670 312h35v28h-35Z"/>
+</g>
+<g clip-path="url(#heat-exchanger-skin)">
+<path class="fl" d="M705 150h105v12h-105Z"/>
+<path class="d25" d="M705 284h105v28h-105Z"/>
+<path class="d50" d="M705 312h105v28h-105Z"/>
+</g>
+<path class="s" d="M670 120h10v220h-10Z M680 120h15v220h-15Z M695 120h10v220h-10Z M705 130H750C780 130 805 175 805 230C805 285 780 330 750 330H705Z M750 130V330" vector-effect="non-scaling-stroke"/>
+<path class="f0" d="M665 120h5v15h-5Z M705 120h5v15h-5Z M665 150h5v15h-5Z M705 150h5v15h-5Z M665 222.5h5v15h-5Z M705 222.5h5v15h-5Z M665 295h5v15h-5Z M705 295h5v15h-5Z M665 325h5v15h-5Z M705 325h5v15h-5Z"/>
+<path class="s" d="M665 120h5v15h-5Z M705 120h5v15h-5Z M665 150h5v15h-5Z M705 150h5v15h-5Z M665 222.5h5v15h-5Z M705 222.5h5v15h-5Z M665 295h5v15h-5Z M705 295h5v15h-5Z M665 325h5v15h-5Z M705 325h5v15h-5Z M665 123.75h5M665 131.25h5 M705 123.75h5M705 131.25h5 M665 153.75h5M665 161.25h5 M705 153.75h5M705 161.25h5 M665 226.25h5M665 233.75h5 M705 226.25h5M705 233.75h5 M665 298.75h5M665 306.25h5 M705 298.75h5M705 306.25h5 M665 328.75h5M665 336.25h5 M705 328.75h5M705 336.25h5" vector-effect="non-scaling-stroke"/>
+<path class="f0" d="M715 80h30v50h-30Z"/>
+<path class="fl" d="M719 80h5v50h-5Z"/>
+<path class="d25" d="M736 80h9v50h-9Z"/>
+<path class="f1" d="M705 70h50v10h-50Z"/>
+<path class="f0" d="M715 330h30v50h-30Z"/>
+<path class="fl" d="M719 330h5v50h-5Z"/>
+<path class="d25" d="M736 330h9v50h-9Z"/>
+<path class="f1" d="M705 380h50v10h-50Z"/>
+<path class="s" d="M715 80h30v50h-30Z M705 70h50v10h-50Z M715 330h30v50h-30Z M705 380h50v10h-50Z" vector-effect="non-scaling-stroke"/>
+</g>
+</g>
+<g data-part="cut-line" style="--i:4">
+<g clip-path="url(#heat-exchanger-outline)">
+<g data-move="" style="--cx:665px;--cy:0px;--m:0"><path class="s" d="M150 40V420" vector-effect="non-scaling-stroke"/></g>
+</g>
+</g>
+<g data-part="callouts" style="--i:5">
+<text class="i" x="30" y="80">HOT IN</text>
+<text class="i" x="30" y="150">SHELL</text>
+<text class="i" x="830" y="80">COLD OUT</text>
+<text class="i" x="687.5" y="425" text-anchor="middle">TUBE SHEET</text>
+<path class="i" d="M275 75L269 77.5L269 72.5Z M207.5 145L201.5 147.5L201.5 142.5Z M755 75L761 72.5L761 77.5Z M687.5 340L690 346L685 346Z"/>
+<path class="s" d="M115 75L269 75 M115 145L201.5 145 M815 75L761 75 M687.5 410L687.5 346" vector-effect="non-scaling-stroke"/>
+<g class="late" data-open-only="">
+<text class="i" x="30" y="235">TUBE BUNDLE</text>
+<text class="i" x="466.5" y="425" text-anchor="middle">BAFFLE</text>
+<path class="i" d="M220 230L214 232.5L214 227.5Z M466.5 314L469 320L464 320Z"/>
+<path class="s" d="M130 230L214 230 M466.5 410L466.5 320" vector-effect="non-scaling-stroke"/>
+</g>
+</g>
+<g data-part="profile" style="--i:5"><path class="s" d="M290 472V574H690M286 574H290M286 550H290M286 526H290M286 502H290M286 478H290M300 574v4M395 574v4M490 574v4M585 574v4M680 574v4" vector-effect="non-scaling-stroke"/><path class="s" d="M300 478L318 481.15L337 484.3L356 487.27L376 490.22L417.5 495.85L461.5 501.19L508.5 506.3L560 511.37L616.5 516.42L680 521.63" vector-effect="non-scaling-stroke"/><path class="s" d="M300 535.07L352 540.76L411.5 546.98L608.5 566.72L680 574" vector-effect="non-scaling-stroke"/><path class="s" d="M300 535.07L319 533.03L338.5 531.14L358.5 529.4L379.5 527.77L401 526.29L423 524.97L445.5 523.79L468.5 522.77L492.5 521.87L517 521.11L568 520.02L622.5 519.47L680 519.46" vector-effect="non-scaling-stroke"/><circle class="fl s" cx="652.17" cy="519.4" r="3.5"/><circle class="i" cx="652.17" cy="519.4" r="1.2"/><text class="i" x="267.78" y="578">30</text><text class="i" x="267.78" y="554">60</text><text class="i" x="267.78" y="530">90</text><text class="i" x="260.56" y="506">120</text><text class="i" x="260.56" y="482">150</text><text class="i" x="267.78" y="462">°C</text><text class="i" x="296.5" y="590">0</text><text class="i" x="380.67" y="590">0.25</text><text class="i" x="479.28" y="590">0.5</text><text class="i" x="570.67" y="590">0.75</text><text class="i" x="676.5" y="590">1</text><text class="i" x="698" y="578">x/L</text><g class="hx-rest"><circle class="fl s" cx="345" cy="475.7" r="3"/><text class="i" x="352" y="479.7">SHELL</text><circle class="i" cx="493" cy="531.1" r="2.2"/><text class="i" x="500" y="535.1">PASS 2</text><circle class="i" cx="323" cy="552.3" r="2.2"/><text class="i" x="330" y="556.3">PASS 1</text><text class="i" x="634.23" y="493.4">CROSS</text><path class="s" d="M652.17 498.4V509.4" vector-effect="non-scaling-stroke"/><path class="i" d="M652.17 515.4L654.67 509.4L649.67 509.4Z"/></g></g>
+<g class="hx-live" data-overlay="" aria-hidden="true">
+<g class="hx-stn" transform="translate(490 0)"><path class="s" d="M0 175V285" vector-effect="non-scaling-stroke"/><circle class="i" cx="0" cy="175" r="2.5"/><circle class="fl s" cx="0" cy="230" r="3.5"/><circle class="i" cx="0" cy="285" r="2.5"/></g>
+<g class="hx-ro hx-ro-r"><path class="s" d="M829 113V127" vector-effect="non-scaling-stroke"/><circle class="i" cx="829" cy="175" r="2.5"/><circle class="fl s" cx="829" cy="230" r="3.5"/><circle class="i" cx="829" cy="285" r="2.5"/><circle class="i" cx="829" cy="202.5" r="1.5"/><g class="hx-q2" data-x="829" data-y="202.5" transform="translate(829 202.5) scale(1 1)"><path class="s" d="M0 0V-13" vector-effect="non-scaling-stroke"/><path class="i" d="M0 -19L2.5 -13L-2.5 -13Z"/></g><circle class="i" cx="829" cy="257.5" r="1.5"/><g class="hx-q1" data-x="829" data-y="257.5" transform="translate(829 257.5) scale(1 -1)"><path class="s" d="M0 0V-13" vector-effect="non-scaling-stroke"/><path class="i" d="M0 -19L2.5 -13L-2.5 -13Z"/></g><text class="i" x="838" y="124">x/L</text><text class="i hx-x" data-rx="936" x="907.34" y="124">0.50</text><text class="i" x="838" y="179">PASS 2</text><text class="i hx-p2" data-rx="921.78" x="893.12" y="179">95.0</text><text class="i" x="921.78" y="179">°C</text><text class="i" x="838" y="234">SHELL</text><text class="i hx-sh" data-rx="921.78" x="885.9" y="234">117.0</text><text class="i" x="921.78" y="234">°C</text><text class="i" x="838" y="289">PASS 1</text><text class="i hx-p1" data-rx="921.78" x="893.12" y="289">54.0</text><text class="i" x="921.78" y="289">°C</text><text class="i" x="838" y="344">CROSS</text><text class="i" data-rx="936" x="907.34" y="344">0.93</text></g>
+<g class="hx-ro hx-ro-l"><path class="s" d="M29 252V266" vector-effect="non-scaling-stroke"/><circle class="i" cx="29" cy="299" r="2.5"/><circle class="fl s" cx="29" cy="339" r="3.5"/><circle class="i" cx="29" cy="379" r="2.5"/><circle class="i" cx="29" cy="319" r="1.5"/><g class="hx-q2" data-x="29" data-y="319" transform="translate(29 319) scale(1 1)"><path class="s" d="M0 0V-6" vector-effect="non-scaling-stroke"/><path class="i" d="M0 -12L2.5 -6L-2.5 -6Z"/></g><circle class="i" cx="29" cy="359" r="1.5"/><g class="hx-q1" data-x="29" data-y="359" transform="translate(29 359) scale(1 -1)"><path class="s" d="M0 0V-6" vector-effect="non-scaling-stroke"/><path class="i" d="M0 -12L2.5 -6L-2.5 -6Z"/></g><text class="i" x="38" y="263">x/L</text><text class="i hx-x" data-rx="136" x="107.34" y="263">0.50</text><text class="i" x="38" y="303">PASS 2</text><text class="i hx-p2" data-rx="121.78" x="93.12" y="303">95.0</text><text class="i" x="121.78" y="303">°C</text><text class="i" x="38" y="343">SHELL</text><text class="i hx-sh" data-rx="121.78" x="85.9" y="343">117.0</text><text class="i" x="121.78" y="343">°C</text><text class="i" x="38" y="383">PASS 1</text><text class="i hx-p1" data-rx="121.78" x="93.12" y="383">54.0</text><text class="i" x="121.78" y="383">°C</text><text class="i" x="38" y="423">CROSS</text><text class="i" data-rx="136" x="107.34" y="423">0.93</text></g>
+<g class="hx-cur" transform="translate(490 0)"><path class="s" d="M0 504.35V554.89" vector-effect="non-scaling-stroke"/><circle class="hx-c1 i" cx="0" cy="554.89" r="2.5"/><circle class="hx-c2 i" cx="0" cy="521.95" r="2.5"/><circle class="hx-cT fl s" cx="0" cy="504.35" r="3.5"/></g>
+</g>
+</svg>
