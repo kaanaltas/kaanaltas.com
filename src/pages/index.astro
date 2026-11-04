@@ -85,8 +85,8 @@ const pages = [
      underlined links with their arrows, which is the whole design without
      JavaScript. With a mouse, keyboard focus or a pressing finger, the
      item's underline rises into a small clear glass tab that slides between
-     them like the nav pill, and fades away when the pointer leaves, giving
-     the underline back. Moved by src/scripts/dock.ts. */
+     them like the nav pill, and sinks back onto the underline when the
+     pointer leaves. Moved by src/scripts/dock.ts. */
   .dock {
     /* The tab reaches this far past the text, so the first label still
        lines up with the lede. */
@@ -167,8 +167,8 @@ const pages = [
      the bottom in light), a faint glow inside the edge where a thick pane
      bends the light, and in light a barely-there lift. 8px corners, never a
      capsule. It rises out of the underline on the bounce spring (a small
-     overshoot), slides on the nav's spring, and on leaving fades where it
-     stands while the underline comes back. */
+     overshoot), slides on the nav's spring, and sinks back without
+     overshoot. */
   .dock-tab {
     --rim: linear-gradient(rgb(20 20 40 / 0.05), rgb(20 20 40 / 0.11));
     position: absolute;
@@ -178,7 +178,6 @@ const pages = [
     width: var(--w, 0);
     height: var(--h, 36px);
     translate: var(--x, 0) var(--y, 0);
-    scale: var(--s, 1);
     border-radius: 8px;
     pointer-events: none;
     opacity: var(--o, 0);
@@ -225,12 +224,23 @@ const pages = [
     opacity: 0;
   }
 
-  /* Leaving: the tab fades out where it is, settling a touch smaller, over
-     the same 180ms in which its label's underline and arrow return. */
-  .dock-tab.is-leaving {
+  /* Sinking is the rise played back, slower and without overshoot: the tab
+     narrows and lowers onto the underline over 480ms, keeps its glass until it
+     is nearly a line, turns underline grey as it lands, and only then fades
+     into the real underline, which returns at the same moment. */
+  .dock-tab.is-sinking {
     transition:
-      scale 180ms var(--ease-out),
-      opacity 180ms var(--ease-out);
+      translate 480ms var(--ease-in-out),
+      width 480ms var(--ease-in-out),
+      height 480ms var(--ease-in-out),
+      border-radius 180ms var(--ease-out) 300ms,
+      background-color 140ms var(--ease-out) 340ms,
+      box-shadow 140ms var(--ease-out) 340ms,
+      opacity 160ms var(--ease-out) 480ms;
+  }
+
+  .dock-tab.is-sinking::before {
+    transition: opacity 200ms var(--ease-out) 260ms;
   }
 
   .dock-tab.no-anim,

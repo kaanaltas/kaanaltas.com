@@ -2,8 +2,8 @@
 // links whose underline, under a mouse or keyboard focus, rises into a small
 // translucent tab. There is no current page here, so the tab has no resting
 // place: it rises out of the hovered item's underline, slides between items
-// like the nav pill (src/scripts/tabs.ts), and fades out where it stands
-// when the pointer leaves, as the underline comes back. A finger gets the
+// like the nav pill (src/scripts/tabs.ts), and when the pointer leaves it
+// sinks back onto that underline, which returns as it lands. A finger gets the
 // same tab while it presses: it can slide along the row, the tab following,
 // and lifting opens the link under it (src/scripts/scrub.ts).
 //
@@ -72,10 +72,9 @@ export function initDock() {
   const rise = (a: HTMLAnchorElement) => {
     clearTimeout(leaveTimer);
     clearTimeout(sinkTimer);
-    const leaving = tab.classList.contains('is-leaving');
-    tab.classList.remove('is-leaving');
-    set('--s', '1');
-    if (!target || (leaving && target !== a)) {
+    const sinking = tab.classList.contains('is-sinking');
+    tab.classList.remove('is-sinking');
+    if (!target || (sinking && target !== a)) {
       // Start from this item's underline, then rise out of it.
       jump(() => {
         tab.classList.add('is-line');
@@ -91,17 +90,17 @@ export function initDock() {
   };
 
   const sink = () => {
-    if (!target) return;
-    // The label's underline and arrow return as the tab fades in place.
-    mark(undefined);
-    tab.classList.add('is-leaving');
+    const a = target;
+    if (!a) return;
+    tab.classList.add('is-sinking', 'is-line');
+    line(a);
     set('--o', '0');
-    set('--s', '0.97');
+    // The label's underline and arrow return as the tab reaches it.
     sinkTimer = window.setTimeout(() => {
+      mark(undefined);
       target = undefined;
-      tab.classList.remove('is-leaving');
-      jump(() => set('--s', '1'));
-    }, 180);
+      tab.classList.remove('is-sinking');
+    }, 480);
   };
 
   const leave = (delay: number) => {
@@ -146,11 +145,11 @@ export function initDock() {
     clearTimeout(sinkTimer);
     target = undefined;
     mark(undefined);
-    tab.classList.remove('is-leaving');
+    tab.classList.remove('is-sinking');
     set('--o', '0');
   });
 
   new ResizeObserver(() => {
-    if (target && !tab.classList.contains('is-leaving')) jump(() => full(target!));
+    if (target && !tab.classList.contains('is-sinking')) jump(() => full(target!));
   }).observe(dock);
 }
